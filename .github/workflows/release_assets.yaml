@@ -19,13 +19,17 @@ jobs:
         with:
           platforms: all
       - name: Set up Docker Buildx
-        id: buildx
         uses: docker/setup-buildx-action@v2
+      - name: Create builder
+        run: |
+          docker buildx create --name mybuilder --driver docker-container --use
+          docker buildx inspect --bootstrap
       - name: Buildx version
         run: docker buildx version
 
   build_acapy:
     needs: setup_buildx
+    name: 'Build Traction Aca-Py'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +44,7 @@ jobs:
         with:
           context: ./plugins
           file: ./plugins/docker/Dockerfile
+          builder: mybuilder
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
@@ -48,6 +53,7 @@ jobs:
 
   build_ui:
     needs: setup_buildx
+    name: 'Build Tenant UI'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,6 +67,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./services/tenant-ui
+          builder: mybuilder
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
@@ -69,6 +76,7 @@ jobs:
   
   build_proxy:
     needs: setup_buildx
+    name: 'Build Tenant Proxy Image'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,6 +91,7 @@ jobs:
         with:
           context: ./plugins
           file: ./plugins/docker/Dockerfile.tenant-proxy
+          builder: mybuilder
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
