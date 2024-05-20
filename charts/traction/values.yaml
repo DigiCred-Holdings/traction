@@ -17,7 +17,7 @@ acapy:
     repository: ghcr.io/honeymodi55/traction-plugins-acapy
     pullPolicy: IfNotPresent
     pullSecrets: []
-    tag: "sha-64234d3"
+    tag: "sha-1710fdb"
 
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -435,7 +435,7 @@ tenant_proxy:
     repository: ghcr.io/honeymodi55/traction-tenant-proxy
     pullPolicy: IfNotPresent
     pullSecrets: []
-    tag: "sha-64234d3"
+    tag: "sha-1710fdb"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ## @param tenant_proxy.serviceAccount.create Specifies whether a ServiceAccount should be created
@@ -593,7 +593,7 @@ ui:
     ## @param ui.image.pullSecrets [array]
     pullSecrets: []
     ## @param ui.image.tag Overrides the image tag which defaults to the chart appVersion.
-    tag: "sha-5382853"
+    tag: "sha-1710fdb"
 
   ## @param ui.existingSecret Name of an existing secret to be mounted as environment variables
   ## For example, when setting smpt.secure to true, a secret is required with the key SERVER_SMTP_PASSWORD
