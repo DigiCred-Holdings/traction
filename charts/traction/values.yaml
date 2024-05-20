@@ -14,10 +14,10 @@ acapy:
   ## @param acapy.image.tag Overrides the image tag which defaults to the chart appVersion.
   ##
   image:
-    repository: ghcr.io/bcgov/traction-plugins-acapy
+    repository: ghcr.io/honeymodi55/traction-plugins-acapy
     pullPolicy: IfNotPresent
     pullSecrets: []
-    tag: "sha-c90ed7d@sha256:2711ec54e4990fd7d094196e392938dd31c8134ff562d36d121b5c1216f53b30"
+    tag: "sha-64234d3"
 
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -432,10 +432,10 @@ tenant_proxy:
   ## @param tenant_proxy.image.tag Overrides the image tag which defaults to the chart appVersion.
   ##
   image:
-    repository: ghcr.io/bcgov/traction-tenant-proxy
+    repository: ghcr.io/honeymodi55/traction-tenant-proxy
     pullPolicy: IfNotPresent
     pullSecrets: []
-    tag: "sha-a3672d9@sha256:180485c86b2ba3b72727a5d05301280e4d3922905c3796f2093d812f5091997f"
+    tag: "sha-64234d3"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ## @param tenant_proxy.serviceAccount.create Specifies whether a ServiceAccount should be created
