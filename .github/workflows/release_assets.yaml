@@ -14,7 +14,6 @@ jobs:
   build_acapy:
     name: 'Build Traction Aca-Py'
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'bcgov'
     steps:
       - uses: actions/checkout@v4    
       - name: Build Aca-Py Image
@@ -31,7 +30,6 @@ jobs:
   build_ui:
     name: 'Build Tenant UI'
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'bcgov'
     steps:      
       - uses: actions/checkout@v4
       - name: Build UI
@@ -47,7 +45,6 @@ jobs:
   build_proxy:
     name: 'Build Tenant Proxy Image'
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'bcgov'
     steps:
       - uses: actions/checkout@v4
       - name: Build Tenant Proxy Image
