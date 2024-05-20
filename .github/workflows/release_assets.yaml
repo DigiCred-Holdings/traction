@@ -16,59 +16,75 @@ jobs:
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2  
+        uses: docker/setup-buildx-action@v2
+      - name: Buildx version
+        run: docker buildx version
 
   build_acapy:
     needs: setup_buildx
-    name: 'Build Traction Aca-Py'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4    
-      - name: Build Aca-Py Image
-        uses: ./.github/actions/build_acapy
-        id: builder
+      - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          context: './plugins'
-          dockerfile: './plugins/docker/Dockerfile'
-          platforms: linux/amd64,linux/arm64
-          image_name: ${{ github.repository_owner}}/traction-plugins-acapy
           registry: ghcr.io
-          registry_username: ${{ github.repository_owner}}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push Aca-Py Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./plugins
+          file: ./plugins/docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/traction-plugins-acapy:latest
+            ghcr.io/${{ github.repository_owner }}/traction-plugins-acapy:${{ github.sha }}
 
   build_ui:
     needs: setup_buildx
-    name: 'Build Tenant UI'
-    runs-on: ubuntu-latest
-    steps:      
-      - uses: actions/checkout@v4
-      - name: Build UI
-        uses: ./.github/actions/build_ui
-        id: builder
-        with:
-          context: './services/tenant-ui'
-          platforms: linux/amd64,linux/arm64
-          image_name: ${{ github.repository_owner}}/traction-tenant-ui
-          registry: ghcr.io
-          registry_username: ${{ github.repository_owner}}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-  
-  build_proxy:
-    needs: setup_buildx
-    name: 'Build Tenant Proxy Image'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Tenant Proxy Image
-        uses: ./.github/actions/build_acapy
-        id: builder
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          context: './plugins'
-          dockerfile: './plugins/docker/Dockerfile.tenant-proxy'
-          platforms: linux/amd64,linux/arm64
-          image_name: ${{ github.repository_owner}}/traction-tenant-proxy
           registry: ghcr.io
-          registry_username: ${{ github.repository_owner}}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push UI Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/tenant-ui
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/traction-tenant-ui:latest
+            ghcr.io/${{ github.repository_owner }}/traction-tenant-ui:${{ github.sha }}
+  
+  build_proxy:
+    needs: setup_buildx
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push Tenant Proxy Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./plugins
+          file: ./plugins/docker/Dockerfile.tenant-proxy
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/traction-tenant-proxy:latest
+            ghcr.io/${{ github.repository_owner }}/traction-tenant-proxy:${{ github.sha }}
