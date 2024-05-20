@@ -24,12 +24,11 @@ jobs:
         run: |
           docker buildx create --name mybuilder --driver docker-container --use
           docker buildx inspect --bootstrap
-      - name: Buildx version
-        run: docker buildx version
+      - name: Verify builder creation
+        run: docker buildx inspect mybuilder
 
   build_acapy:
     needs: setup_buildx
-    name: 'Build Traction Aca-Py'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +52,6 @@ jobs:
 
   build_ui:
     needs: setup_buildx
-    name: 'Build Tenant UI'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +74,6 @@ jobs:
   
   build_proxy:
     needs: setup_buildx
-    name: 'Build Tenant Proxy Image'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
