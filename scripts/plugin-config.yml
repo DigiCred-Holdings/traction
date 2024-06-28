@@ -17,16 +17,10 @@ traction_innkeeper:
     print_token: true
     connect_to_endorser:
       [
-        {
-          "endorser_alias": "bcovrin-test-endorser",
-          "ledger_id": "bcovrin-test",
-        },
-        {
-          "endorser_alias": "bcovrin-test-endorser-1",
-          "ledger_id": "bcovrin-test-1",
-        },
+        { "endorser_alias": "digicred-endorser", "ledger_id": "digicred" },
+        { "endorser_alias": "digicred-endorser-1", "ledger_id": "digicred-1" },
       ]
-    create_public_did: ["bcovrin-test", "bcovrin-test-1"]
+    create_public_did: ["digicred", "digicred-1"]
   reservation:
     auto_approve: true
     expiry_minutes: 2880

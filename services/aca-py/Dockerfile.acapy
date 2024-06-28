@@ -1,4 +1,6 @@
 FROM --platform=$BUILDPLATFORM traction:plugins-acapy
+#If you get an error saying that image unknown, new builds should replace the first line with the following one, the name of the image has been changed.
+#FROM --platform=$BUILDPLATFORM docker.io/sajib2hassan/traction:plugins-acapy
 
 USER root
 

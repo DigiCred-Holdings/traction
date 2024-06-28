@@ -12,3 +12,10 @@ plugins/poetry.lock
 
 .idea
 **/.idea
+
+#Config files to ignore
+services/tenant-ui/config/default.json
+scripts/ledgers.yml
+services/aca-py/ngrok-wait.sh
+services/tenant-ui/config/default.json
+scripts/plugin-config.yml

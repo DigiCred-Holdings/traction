@@ -17,6 +17,14 @@
     "credentialOffered": "Credential offer sent, student need to accept the ID on their wallet",
     "return": "Return to onboarding of next student"
   },
+  "bulkIssue": {
+    "bulkIssue": "Bulk Issue",
+    "totalConnections": "Total Connections: {count}",
+    "connectionsWithStudentId": "Connections With Student ID: {count}",
+    "sendOffer": "Send Offer",
+    "successfulOffers": "Successful Offers",
+    "failedOffers": "Failed Offers"
+  },
   "transcript": {
     "transcript": "Transcript",
     "studentID": "Student ID",
@@ -600,14 +608,5 @@
     "presentationRequestBody": "Proof Request",
     "verification": "Verification",
     "verifications": "Verifications"
-  },
-
-  "bulkIssue": {
-    "bulkIssue": "Bulk Issue",
-    "totalConnections": "Total Connections: {count}",
-    "connectionsWithStudentId": "Connections With Student ID: {count}",
-    "sendOffer": "Send Offer",
-    "successfulOffers": "Successful Offers",
-    "failedOffers": "Failed Offers"
   }
 }
