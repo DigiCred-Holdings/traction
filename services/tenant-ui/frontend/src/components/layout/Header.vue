@@ -1,6 +1,6 @@
 <template>
   <Toolbar class="traction-header">
-    <template #start>
+    <!-- <template #start>
       <div
         class="hamburger"
         :title="$t('layout.header.toggleSideMenu')"
@@ -8,10 +8,10 @@
       >
         <i class="pi pi-bars p-toolbar-separator mr-2" />
       </div>
-    </template>
+    </template> -->
 
     <template #end>
-      <LocaleSwitcher />
+      <!-- <LocaleSwitcher /> -->
       <ProfileButton />
       <SessionTimer />
     </template>

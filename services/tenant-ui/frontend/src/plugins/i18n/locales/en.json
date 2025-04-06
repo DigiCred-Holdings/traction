@@ -351,6 +351,7 @@
     }
   },
   "login": {
+    "login": "Login",
     "backToSignIn": "Go Back to Sign-in",
     "checkStatus": "Check Status!",
     "createRequest": "Create Request!",
@@ -358,7 +359,9 @@
     "noAccount": "Don't have an account?",
     "submit": "Sign-In",
     "submittedRequest": "Already Submitted Request?",
-    "walletSecret": "Wallet Key"
+    "walletSecret": "Wallet Key",
+    "credentialingProcess": "DigiCred streamlines the credentialing process with a secure and efficient system, making it easy for administrators to issue and manage student records while ensuring data integrity and accessibility.",
+    "credentialingProcessTitle": "- John Doe, College Administrator"
   },
   "messages": {
     "connectionId": "Connection ID",

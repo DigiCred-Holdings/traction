@@ -17,9 +17,15 @@ body {
   display: flex;
   width: 100%;
   .layout-sidebar {
-    background-color: $tenant-ui-primary-color;
+    background-color: $tenant-ui-new-primary-color;
     color: $tenant-ui-text-on-primary;
-    min-width: 20em;
+    width: 215px;
+    padding: 20px;
+  }
+  @media (max-width: 1000px) {
+    .layout-sidebar {
+        padding: 5px;
+    }
   }
   // Innkeeper specifics
   &.innkeeper-layout .layout-sidebar {
@@ -39,7 +45,7 @@ body {
 
   .layout-content {
     flex: 1;
-    background-color: #e4e4e4;
+    background-color: $tenant-ui-new-primary-color;
     padding: 0.5em;
 
     // The card container for pages
@@ -125,20 +131,32 @@ body {
   .p-panelmenu {
     .p-panelmenu-panel {
       * {
-        border: none !important;
-        font-weight: normal !important;
-        background-color: $tenant-ui-primary-color !important;
-        color: $tenant-ui-text-on-primary !important;
+        border: none;
+        font-weight: normal;
+        background-color: transparent;
+        border-radius: 5px;
+        color: $tenant-ui-new-text-on-primary;
       }
       .p-submenu-list {
-        padding-left: 2.5em;
+        border-left: 1px solid $tenant-ui-new-accent-color;
+        border-radius: 0;
+        padding-left: 0.75em;
+        .p-menuitem a:hover{
+          .p-menuitem-icon, .p-menuitem-text{
+              color: $tenant-ui-new-accent-color !important;
+          }
+        }
+        .p-menuitem-icon{
+          margin-right: 0.5em;
+        }
       }
       // Override the order of the drop down icon
       .p-panelmenu-header {
+        display: flex;
+        font-family: 'Open Sans';
         .p-panelmenu-header-content {
           width: 100%;
         }
-        display: flex;
         svg.p-submenu-icon {
           display: flex;
           order: 2;
@@ -147,6 +165,7 @@ body {
         .p-panelmenu-header-action {
           padding-top: 0.75em;
           padding-bottom: 0.75em;
+          padding-left: 0.75em;
         }
         .p-menuitem-icon {
           font-size: 1.3em;
@@ -168,8 +187,9 @@ body {
 // Header Layout Styling
 .traction-header {
   &.p-toolbar {
-    background-color: white !important;
-    border-radius: 0 !important;
+    background-color: $tenant-ui-new-primary-color;
+    border-radius: 0;
+    border: none;
   }
 }
 

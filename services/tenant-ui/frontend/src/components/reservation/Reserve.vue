@@ -141,10 +141,16 @@ const manElements = [
   {
     type: 'Control',
     scope: '#/properties/tenantName',
+    options: {
+      placeholder: 'Tenant Name *',
+    },
   },
   {
     type: 'Control',
     scope: '#/properties/emailAddress',
+    options: {
+      placeholder: 'Email Address *',
+    },
   },
 ];
 
@@ -168,9 +174,6 @@ const compileForm = (response: any) => {
       ...manProperties,
       ...response.data.formDataSchema.properties,
     };
-    /**
-     * Otherwise, just use the mandatory properties.
-     */
   } else {
     mergedProperties = manProperties;
   }
@@ -182,9 +185,6 @@ const compileForm = (response: any) => {
   let mergedRequired = [];
   if (response.data?.formDataSchema?.required) {
     mergedRequired = [...manRequired, ...response.data.formDataSchema.required];
-    /**
-     * Otherwise, just use the mandatory required array.
-     */
   } else {
     mergedRequired = manRequired;
   }
@@ -201,7 +201,24 @@ const compileForm = (response: any) => {
 
   let mergedElements = [];
   if (response.data?.formUISchema?.elements) {
-    mergedElements = [...manElements, ...response.data.formUISchema.elements];
+    // Add placeholder options to each custom form element
+    const customElementsWithPlaceholders =
+      response.data.formUISchema.elements.map((element: any) => {
+        if (element.type === 'Control') {
+          const fieldName = element.scope.split('/').pop();
+          return {
+            ...element,
+            options: {
+              ...element.options,
+              placeholder: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, ' $1')}${mergedRequired.includes(fieldName) ? ' *' : ''}`,
+              showUnfocusedDescription: false,
+              hideRequiredAsterisk: true,
+            },
+          };
+        }
+        return element;
+      });
+    mergedElements = [...manElements, ...customElementsWithPlaceholders];
   } else {
     mergedElements = manElements;
   }
@@ -212,22 +229,26 @@ const compileForm = (response: any) => {
   };
 };
 
+// Update the default form configuration as well
+const defaultFormConfig = () => {
+  formDataSchema.value = {
+    type: 'object',
+    properties: { ...manProperties },
+    required: [...manRequired],
+  };
+  formUISchema.value = {
+    type: 'VerticalLayout',
+    elements: [...manElements],
+  };
+};
+
 axios
   .get('forms/reservation.json')
   .then(compileForm)
   .catch((error) => {
     console.error('Could not find any custom form configuration. :(', error);
     console.info('Defaulting to the hard-coded form configuration.');
-
-    formDataSchema.value = {
-      type: 'object',
-      properties: { ...manProperties },
-      required: [...manRequired],
-    };
-    formUISchema.value = {
-      type: 'VerticalLayout',
-      elements: [...manElements],
-    };
+    defaultFormConfig();
   });
 
 const renderers = [...vanillaRenderers];
@@ -325,13 +346,22 @@ const handleSubmit = async (event: any) => {
   margin-bottom: 0.5rem;
   input,
   textarea {
-    width: 100%;
     border-radius: 5px;
-    border: 1px solid #ced4da;
-    padding: 0.45rem;
-    color: #495057;
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 1rem;
+    background-color: #ffffff;
+    border: 0;
+    height: 42px;
+    width: 100%;
+    text-indent: 10px;
+    box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2);
+    font-family: 'Open Sans';
+    &:hover,
+    &:focus {
+      box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2) !important;
+    }
+  }
+  textarea {
+    max-width: 100%;
+    min-height: 100px;
   }
   input:hover,
   input:focus,
@@ -358,6 +388,20 @@ const handleSubmit = async (event: any) => {
   }
 }
 :deep(.vertical-layout-item) {
-  margin: 1.5rem 0 1rem 0;
+  margin: 1rem 0 1rem 0;
+  label.label {
+    display: none;
+  }
+}
+.p-button.p-component {
+  background-color: $tenant-ui-new-accent-color !important;
+  border: none;
+  font-family: 'Open Sans';
+}
+button.p-button:not(.p-button-rounded):not(.p-danger):not(.p-button-text):not(
+    .p-button-link
+  ):hover {
+  background-color: $tenant-ui-new-accent-color !important;
+  box-shadow: none !important;
 }
 </style>

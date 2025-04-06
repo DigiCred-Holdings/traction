@@ -1,11 +1,12 @@
 <template>
   <div class="traction-sidebar">
-    <h1 class="sidebar-app-title">
+    <!-- <h1 class="sidebar-app-title">
       <ProgressSpinner v-if="loading" />
       <span v-if="tenant">{{ tenant.tenant_name }}</span>
-    </h1>
+    </h1> -->
+    <img src="/img/digicred/logo-menu-top.png" class="logo-menu-top" />
     <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
-    <h1 class="sidebar-app-title small">T</h1>
+    <!-- <h1 class="sidebar-app-title small">T</h1> -->
     <PanelMenu :model="sidebarItems" class="mt-5">
       <template #item="{ item }">
         <PanelMenuItemLink :item="item" />
@@ -127,3 +128,9 @@ if (config?.frontend?.logStreamUrl) {
   });
 }
 </script>
+<style lang="scss">
+.logo-menu-top {
+  display: block;
+  margin-top: 10px;
+}
+</style>

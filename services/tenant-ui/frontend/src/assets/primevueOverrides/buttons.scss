@@ -6,6 +6,7 @@ button {
       padding: 0.5rem 1rem;
       background-color: $tenant-ui-secondary-color;
       border-color: $tenant-ui-secondary-color;
+      font-family: 'Open Sans';
       &:hover,
       &:active {
         background-color: $tenant-ui-secondary-active !important;
@@ -18,7 +19,7 @@ button {
   }
   &.p-button-rounded,
   &.p-button-text {
-    color: $tenant-ui-secondary-color !important;
+    color: $tenant-ui-new-text-on-primary !important;
     > .p-button-label {
       font-weight: normal;
     }
