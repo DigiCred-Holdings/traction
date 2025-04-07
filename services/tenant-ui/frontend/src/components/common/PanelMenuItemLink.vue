@@ -56,7 +56,7 @@ const hasActiveChild = computed(() => {
 
   return props.item.items.some((item: MenuItem) => {
     if (item.route) {
-      return route.path.startsWith(item.route.toString());
+      return route?.path?.startsWith(item.route.toString());
     }
     return false;
   });
@@ -71,7 +71,7 @@ watch(hasActiveChild, (newValue) => {
 
 // Watch route changes to close dropdown when navigating away
 watch(
-  () => route.path,
+  () => route?.path,
   (newPath) => {
     if (!hasActiveChild.value) {
       isOpen.value = false;

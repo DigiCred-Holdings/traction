@@ -264,6 +264,8 @@ const handleSubmit = async (isFormValid: boolean) => {
     formFields.walletSecret = formFields.walletSecret.trim();
     formFields.tenantId = formFields.tenantId.trim();
     formFields.apiKey = formFields.apiKey.trim();
+    formFields.emailId = formFields.emailId.trim();
+    formFields.passwordId = formFields.passwordId.trim();
     // Get a token
     if (activeTab.value === 2) {
       await tokenStore.login(formFields.tenantId, formFields.apiKey, true);
@@ -273,10 +275,10 @@ const handleSubmit = async (isFormValid: boolean) => {
         formFields.walletSecret,
         false
       );
+    } else if (activeTab.value === 0) {
+      await tokenStore.login(formFields.emailId, formFields.passwordId, false);
     }
-    console.log(token.value);
   } catch (err: any) {
-    console.error(err);
     if (err.response?.status === 404 || err.response?.status === 409) {
       // Handle wallet not found or bad password for this as a status not an exception
       invalidCreds.value = true;

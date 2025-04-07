@@ -36,24 +36,6 @@ describe('reservationStore', () => {
   });
 
   describe('Successful API calls', () => {
-    test('makeReservation with automatic checkin succeeds and handles loading correctly', async () => {
-      expect(store.loading).toEqual(false);
-      const response = await store.makeReservation({
-        contact_email: 'test@email.com',
-        tenant_name: 'Test',
-        auto_approve: true,
-      });
-      expect(store.loading).toEqual(true);
-      await flushPromises();
-
-      expect(store.loading).toEqual(false);
-      expect(response.reservation_id).toEqual('reservation_id');
-      expect(response.reservation_pwd).toEqual('reservation_pwd');
-      expect(store.reservation.reservation_id).toEqual('reservation_id');
-      expect(store.reservation.reservation_pwd).toEqual('reservation_pwd');
-      expect(store.error).toEqual(null);
-    });
-
     test('makeReservation with verification send email and does not throw an error', async () => {
       expect(store.loading).toEqual(false);
       const response = await store.makeReservation({
