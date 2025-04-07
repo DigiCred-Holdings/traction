@@ -3,8 +3,15 @@
     <!-- the suspense tag is so we can await any of these components.
          sidebar loads the tenant async -->
     <div class="layout-container">
-      <nav class="layout-sidebar" :class="sidebarOpenClass">
+      <nav
+        class="layout-sidebar flex flex-column justify-content-between"
+        :class="sidebarOpenClass"
+      >
         <Sidebar />
+        <img
+          src="/img/digicred/logo-menu-bottom.png"
+          class="logo-menu-bottom"
+        />
       </nav>
       <div class="layout-page">
         <header class="layout-header">
@@ -36,3 +43,16 @@ import { useCommonStore } from '@/store/commonStore';
 
 const { sidebarOpenClass } = storeToRefs(useCommonStore());
 </script>
+
+<style lang="scss">
+.logo-menu-bottom {
+  border: 1px solid #424242;
+  border-radius: 5px;
+  padding: 15px;
+}
+@media (max-width: 1000px) {
+  .logo-menu-bottom {
+    padding: 5px;
+  }
+}
+</style>

@@ -1,16 +1,13 @@
 <template>
   <div class="traction-login grid w-screen flex-grow-1 mt-0">
-    <div class="col-12 md:col-6 xl:col-4">
-      <div class="px-8">
-        <div class="pt-4 pb-6">
-          <img src="/img/digicred/digicred.png" class="logo-bc" />
-
-          <img src="/img/digicred/CrMS.svg" class="logo-traction" />
-        </div>
-
+    <div class="lg:col-6 col-12 p-0 overflow-hidden left-bg">
+      <div class="py-8 lg:ml-8 lg:text-left text-center">
+        <img src="/img/digicred/logoDigiCred.png" />
+      </div>
+      <div class="lg:px-8 px-4">
         <!-- Logging In -->
         <div v-if="loginMode === LOGIN_MODE.SIGNIN" class="pt-6">
-          <LoginForm />
+          <LoginForm @tab-change="handleTabChange" />
           <div
             v-if="
               stringOrBooleanTruthy(config.frontend.showOIDCReservationLogin)
@@ -26,12 +23,14 @@
 
           <div
             v-if="
-              user ||
-              !stringOrBooleanTruthy(config.frontend.showOIDCReservationLogin)
+              (user ||
+                !stringOrBooleanTruthy(
+                  config.frontend.showOIDCReservationLogin
+                )) &&
+              currentTab === 1
             "
-            class="mt-6"
           >
-            <p>
+            <p class="login-mode-margin">
               {{ $t('login.noAccount') }}
               <a
                 href="#"
@@ -40,7 +39,7 @@
                 >{{ $t('login.createRequest') }}</a
               >
             </p>
-
+            <!-- 
             <p>
               {{ $t('login.submittedRequest') }}
               <a
@@ -49,7 +48,7 @@
                 @click.prevent="loginMode = LOGIN_MODE.STATUS"
                 >{{ $t('login.checkStatus') }}</a
               >
-            </p>
+            </p> -->
           </div>
         </div>
 
@@ -86,10 +85,18 @@
       </div>
     </div>
 
-    <div class="cover-image hidden md:block col-0 md:col-6 xl:col-8 p-0">
-      <span v-if="config.frontend.ux.coverImageCopyright" class="copyright">
-        {{ config.frontend.ux.coverImageCopyright }}
-      </span>
+    <div class="lg:col-6 col-12 p-0 overflow-hidden cover-image">
+      <div class="flex flex-column h-full">
+        <div class="lg:p-8 px-4 py-8 lg:ml-8 testimonial-section">
+          <div class="text-white mb-3">
+            {{ $t('login.credentialingProcess') }}
+          </div>
+          <div class="text-white">
+            {{ $t('login.credentialingProcessTitle') }}
+          </div>
+        </div>
+        <div class="dashboard-preview ml-8" />
+      </div>
     </div>
   </div>
   <SessionTimeoutModal />
@@ -138,6 +145,12 @@ if (route.name === 'TenantUiReservationStatus') {
   loginMode.value = LOGIN_MODE.STATUS;
 }
 
+const currentTab = ref(0);
+
+const handleTabChange = (tabIndex: number) => {
+  currentTab.value = tabIndex;
+};
+
 const goBack = (event: any) => {
   if (status.value === RESERVATION_STATUSES.SHOW_WALLET) {
     confirm.require({
@@ -163,8 +176,48 @@ const doGoBack = () => {
 
 <style scoped lang="scss">
 // See layout.scss for generalized common login layout stuff
-// Set the image specific to this component here though
 .cover-image {
-  background-image: url('/img/digicred/jason-w-bYoRZI30nEI-unsplash.jpg');
+  background-color: #6666cc;
+  display: flex;
+  flex-direction: column;
+}
+.testimonial-section {
+  padding-left: 50px !important;
+  font-size: 20px;
+  > div:first-child {
+    font-weight: 700;
+  }
+  > div:last-child {
+    font-weight: 400;
+  }
+}
+.dashboard-preview {
+  position: relative;
+  background-position: left top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url('/img/digicred/loginDash.png');
+  height: 100%;
+  right: -50px;
+}
+.left-bg {
+  background-color: #f4f4f4;
+}
+.p-button-link.login-mode {
+  color: #6666cc !important;
+}
+.login-mode-margin {
+  margin-top: -30px;
+}
+@media (max-width: 991px) {
+  .left-bg {
+    padding-bottom: 50px !important;
+  }
+  .cover-image {
+    min-height: 500px;
+  }
+  .login-mode-margin {
+    margin-top: -30px;
+  }
 }
 </style>

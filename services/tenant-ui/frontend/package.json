@@ -17,8 +17,10 @@
   },
   "dependencies": {
     "@intlify/unplugin-vue-i18n": "^6.0.3",
+    "@jamescoyle/vue-icon": "^0.1.2",
     "@jsonforms/vue": "^3.5.1",
     "@jsonforms/vue-vanilla": "^3.5.1",
+    "@mdi/js": "^7.4.47",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
     "axios": "^1.7.7",

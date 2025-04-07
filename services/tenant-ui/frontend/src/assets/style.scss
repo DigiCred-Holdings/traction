@@ -5,6 +5,7 @@
 @forward 'toast.scss';
 @forward 'variables.scss';
 @use 'variables.scss' as *;
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 // General HTML
 html,
@@ -14,9 +15,8 @@ body,
   padding: 0;
   margin: 0;
 }
-
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', sans-serif !important;
   font-size: 14px;
   font-weight: 400;
 
