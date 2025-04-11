@@ -44,14 +44,20 @@ jobs:
           # Convert repository owner to lowercase for Docker tags
           echo "OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
       
-      - name: Build Plugins AcaPy Image (dependency)
+      - name: Build and Push Plugins AcaPy Image
         uses: docker/build-push-action@v6
         with:
           context: ./plugins
           file: ./plugins/docker/Dockerfile
-          push: false
-          load: true
-          tags: traction:plugins-acapy
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-plugins-acapy:latest
+            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-plugins-acapy:${{ steps.set_version.outputs.VERSION }}
+      
+      - name: Temporarily modify Dockerfile.acapy to use GHCR image
+        run: |
+          sed -i "s|FROM --platform=\$BUILDPLATFORM traction:plugins-acapy|FROM --platform=\$BUILDPLATFORM ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-plugins-acapy:latest|" ./services/aca-py/Dockerfile.acapy
       
       - name: Build and push Traction Agent
         uses: docker/build-push-action@v6
