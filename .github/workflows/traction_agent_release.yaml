@@ -67,5 +67,5 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-agent:latest
-            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-agent:${{ steps.set_version.outputs.VERSION }} 
+            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-agent-v1.0.1:latest
+            ghcr.io/${{ steps.set_version.outputs.OWNER_LOWERCASE }}/traction-agent-v1.0.1:${{ steps.set_version.outputs.VERSION }} 
