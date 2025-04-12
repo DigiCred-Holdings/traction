@@ -5,7 +5,7 @@ fullnameOverride: ""
 ingressSuffix: "digicred.services"
 acapy:
   image:
-    repository: ghcr.io/honeymodi55/traction-plugins-acapy
+    repository: ghcr.io/digicred-holdings/traction-plugins-acapy-v1.0.1:latest
     pullPolicy: IfNotPresent
     pullSecrets: []
     tag: "sha-76a1e9c@sha256:399d5133fe1f06dcd11415b14b6ea029a1fe960e6767e527170cb9ed7eb2e9e9"
@@ -272,7 +272,7 @@ acapy:
 ##
 tenant_proxy:
   image:
-    repository: ghcr.io/honeymodi55/traction-tenant-proxy
+    repository: ghcr.io/digicred-holdings/traction-tenant-proxy-v1.0.1:latest
     pullPolicy: IfNotPresent
     pullSecrets: []
     tag: "sha-76a1e9c@sha256:f884591c68bc4f872859f4b56f89e70029018bb8830ff4eb892862631726cf4a"
@@ -341,7 +341,7 @@ ui:
   ## @param ui.lokiUrl The endpoint to stream loki logs from for the Tenant UI
   lokiUrl: ""
   image:
-    repository: ghcr.io/honeymodi55/traction-tenant-ui
+    repository: ghcr.io/digicred-holdings/traction-tenant-ui-v1.0.1:latest
     pullPolicy: IfNotPresent
     pullSecrets: []
     tag: "sha-76a1e9c@sha256:6b0ec919cd51a354e4641c41c1183d1b3355a0c5626c721c56a466bd3b4ce18b"
