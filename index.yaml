@@ -38,6 +38,6 @@ entries:
     - https://github.com/bcgov/traction
     type: application
     urls:
-    - traction-0.2.90001.tgz
-    version: 0.2.90001
+    - traction-0.3.5.tgz
+    version: 0.3.5
 generated: "2024-05-20T17:49:48.8635-04:00"
