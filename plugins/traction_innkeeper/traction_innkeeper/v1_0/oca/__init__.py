@@ -56,7 +56,7 @@ async def on_startup(profile: Profile, event: Event):
     )
     if hasattr(srv, "additional_routes_pattern"):
         srv.additional_routes_pattern  # build pattern on older ACA-Py
-    LOGGER.info(f"Allowed route pattern = {srv.additional_routes_pattern}")
+        LOGGER.info(f"Allowed route pattern = {srv.additional_routes_pattern}")
 
     # and we need to tell the server to load the additional routes
     # first call to this property "builds" the underlying property...
