@@ -54,10 +54,14 @@ async def on_startup(profile: Profile, event: Event):
     profile.context.settings.set_value(
         "multitenant.base_wallet_routes", base_wallet_routes
     )
+    if hasattr(srv, "additional_routes_pattern"):
+        srv.additional_routes_pattern  # build pattern on older ACA-Py
+    LOGGER.info(f"Allowed route pattern = {srv.additional_routes_pattern}")
+
     # and we need to tell the server to load the additional routes
     # first call to this property "builds" the underlying property...
-    srv.additional_routes_pattern
+    # srv.additional_routes_pattern
     # our pattern should be known to the server now...
     # second call to the property should return all the patterns it will use
-    LOGGER.info(f"srv.additional_routes_pattern = {srv.additional_routes_pattern}")
+    # LOGGER.info(f"srv.additional_routes_pattern = {srv.additional_routes_pattern}")
     LOGGER.info("< on_startup")
