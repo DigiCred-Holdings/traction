@@ -3,7 +3,7 @@
 # ... if you want to echo the aca-py startup command ...
 # set -x
 
-export ACAPY_ENDPOINT=http://localhost:8030
+# export ACAPY_ENDPOINT=http://localhost:8030
 
 echo "fetched end point [$ACAPY_ENDPOINT]"
 
