@@ -1,25 +1,102 @@
 <template>
-  <div class="surface-section px-4 py-8 md:px-6 lg:px-8 text-center">
-    <div class="center-boxed">
-      <div class="img-holder">
-        <img src="/img/digicred/CrMS.svg" />
-      </div>
+  <div class="row flex flex-wrap main-dashboard lg:m-0">
+    <div class="col-12 lg:col-6 left-container lg:p-0">
+      <Card
+        title="Student IDs Issued"
+        :value="
+          String(summary.find((item) => item.kind === 'Credential')?.count || 0)
+        "
+      />
+      <Card
+        title="Transcripts Issued"
+        :value="
+          String(summary.find((item) => item.kind === 'Transcript')?.count || 0)
+        "
+      />
+      <Card
+        title="Messages"
+        :value="
+          String(summary.find((item) => item.kind === 'Message')?.count || 0)
+        "
+      />
+      <Card
+        title="Onboarded"
+        :value="
+          String(summary.find((item) => item.kind === 'Connection')?.count || 0)
+        "
+      />
+      <!-- TODO: We need to get the invited and failed counts from the API -->
+      <Card title="Invited" value="0" />
+      <Card title="Failed" value="0" />
     </div>
-    <div class="mt-3 mb-3 font-bold text-2xl">
-      <span class="text-900">{{ $t('dashboard.greeting') }}</span>
+    <div class="col-12 lg:col-6 right-container lg:py-0">
+      <Chart
+        :onboarded="
+          Number(summary.find((item) => item.kind === 'Connection')?.count || 0)
+        "
+        :invited="0"
+        :failed="0"
+      />
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import axios from 'axios';
+import Card from '@/components/dashbaord/Card.vue';
+import Chart from '@/components/dashbaord/Chart.vue';
+import { computed, onMounted, ref } from 'vue';
 
-<style>
-.center-boxed {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+interface SummaryItem {
+  kind: 'Credential' | 'Transcript' | 'Message' | 'Connection';
+  count: number;
 }
 
-.img-holder {
-  width: 300px;
-  height: 300px;
+const apiStatus = ref('Loading wallet data...');
+const summary = ref<SummaryItem[]>([]);
+
+const totalItems = computed(() =>
+  summary.value.reduce((total, item) => total + item.count, 0)
+);
+
+onMounted(async () => {
+  console.log('Dashboard component mounted');
+  fetchSummaryData();
+});
+
+const fetchSummaryData = async () => {
+  try {
+    const response = await axios.get<SummaryItem[]>('/api/items/summary');
+    summary.value = response.data;
+    console.log('Dashboard: Summary data received:', summary.value);
+
+    // Update API status with credential count
+    const credentialItem = summary.value.find(
+      (item) => item.kind === 'Credential'
+    );
+    console.log('Dashboard: Credential item:', credentialItem);
+    if (credentialItem) {
+      apiStatus.value = `Found ${credentialItem.count} Credentials, ${totalItems.value} total items`;
+    } else {
+      apiStatus.value = `Found ${totalItems.value} total items`;
+    }
+  } catch (error: unknown) {
+    console.error('Failed to fetch summary:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    apiStatus.value = `Error fetching summary: ${errorMessage}`;
+  }
+};
+</script>
+<style lang="scss">
+.main-dashboard {
+  .left-container {
+    grid-gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 </style>

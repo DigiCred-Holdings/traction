@@ -18,9 +18,8 @@
           <Header />
         </header>
         <main class="layout-content">
-          <MainCard>
-            <router-view />
-          </MainCard>
+          <!-- <MainCard> </MainCard> -->
+          <router-view />
         </main>
         <footer class="bottom-0 layout-footer">
           <Footer />

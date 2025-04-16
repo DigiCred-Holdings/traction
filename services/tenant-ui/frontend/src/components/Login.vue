@@ -6,7 +6,7 @@
       </div>
       <div class="lg:px-8 px-4">
         <!-- Logging In -->
-        <div v-if="loginMode === LOGIN_MODE.SIGNIN" class="pt-6">
+        <div v-if="loginMode === LOGIN_MODE.SIGNIN" class="pt-8">
           <LoginForm @tab-change="handleTabChange" />
           <div
             v-if="

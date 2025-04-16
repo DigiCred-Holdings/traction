@@ -33,21 +33,29 @@ import Log from '@/views/Log.vue';
 import { RESERVATION_STATUS_ROUTE } from '@/helpers/constants';
 // Tablet
 import OnboardingTablet from '@/views/OnboardingTablet.vue';
+import { RouteRecordRaw } from 'vue-router';
+// import i18n from '@/plugins/i18n/i18n';
 
-const tenantRoutes = [
+const tenantRoutes: RouteRecordRaw[] = [
   // Tenant Routes (base / is Tenant side for this app)
   {
     path: '/',
     name: 'TenantUi',
     component: TenantUi,
     children: [
-      { path: 'dashboard', name: 'Dashboard', component: Dashboard },
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/Dashboard.vue'),
+        meta: { title: 'Dashboard' },
+      },
 
       // About
       {
         path: '/onboarding',
         name: 'onboarding',
         component: Onboarding,
+        meta: { title: 'Onboarding' },
       },
 
       // About
