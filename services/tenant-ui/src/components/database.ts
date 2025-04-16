@@ -284,7 +284,7 @@ export const getTables = async () => {
  * @param {string} tableName The name of the table
  * @returns {Promise<Array>} Column information for the table
  */
-export const getTableSchema = async (tableName) => {
+export const getTableSchema = async (tableName: any) => {
   try {
     const result = await pool.query(
       `
@@ -322,7 +322,7 @@ export const getAllItemsFromPublicSchema = async () => {
     }
 
     // Return information about the database
-    const databaseInfo = {
+    const databaseInfo: any = {
       database: dbConfig.database,
       tables: tables,
       tableDetails: [],
@@ -343,7 +343,7 @@ export const getAllItemsFromPublicSchema = async () => {
     }
 
     return databaseInfo;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Database: Error fetching database info:", error);
     return [
       { error: "Error fetching database info", details: error.message },
