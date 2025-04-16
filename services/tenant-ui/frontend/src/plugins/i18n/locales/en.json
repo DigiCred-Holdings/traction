@@ -15,7 +15,11 @@
     "contactAdded": "Successfully established the connection! ",
     "issuingStudentID": "Issuing StudentID in progress... ",
     "credentialOffered": "Credential offer sent, student need to accept the ID on their wallet",
-    "return": "Return to onboarding of next student"
+    "return": "Return to onboarding of next student",
+    "step1EnterStudentID": "Step 1: Enter Student ID",
+    "step2:QRCode": "Step 2: QR Code",
+    "pleaseEnterTheStudent": "Please enter the student ID to generate a QR code that is used to onboard a student.",
+    "reset": "Reset"
   },
   "bulkIssue": {
     "bulkIssue": "Bulk Issue",
@@ -293,7 +297,13 @@
   "dashboard": {
     "backToDashboard": "Back to Dashboard",
     "dashboard": "Dashboard",
-    "greeting": "DigiCred CrMS"
+    "greeting": "DigiCred CrMS",
+    "crmsTitle": "CrMS Dashboard",
+    "connections": "Connections",
+    "onboarded": "Onboarded",
+    "invited": "Invited",
+    "failed": "Failed",
+    "noData": "No Data"
   },
   "holder": {
     "holder": "Holder"

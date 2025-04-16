@@ -5,12 +5,12 @@
       v-if="qrContent"
       class="qr-image"
       :value="qrContent"
-      :size="400"
+      :size="300"
       level="H"
     />
 
     <!-- Plain text of link -->
-    <div class="field mt-5 w-full">
+    <!-- <div class="field mt-5 w-full">
       <label for="inviteUrl">{{ $t('common.invitationUrl') }}</label>
       <div class="p-inputgroup">
         <InputText
@@ -27,7 +27,7 @@
           @click="copy_to_clipboard"
         />
       </div>
-    </div>
+    </div> -->
   </div>
   <span v-else>{{ $t('qrCode.noContentFound') }}</span>
 </template>
@@ -56,6 +56,12 @@ const copy_to_clipboard = () => {
 </script>
 
 <style>
+.qr-container {
+  position: relative;
+  z-index: 1;
+  margin-left: -4px;
+  margin-top: -4px;
+}
 .qr-image {
   display: flex;
   margin-bottom: 25px;
