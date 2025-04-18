@@ -1,23 +1,21 @@
 <template>
-  <div class="traction-footer flex justify-content-between flex-wrap">
-    <div>{{ $t('dashboard.greeting') }}</div>
-    <div>{{ config.frontend.ux.copyright }} {{ config.frontend.ux.owner }}</div>
+  <div class="traction-footer flex justify-content-end p-2 pr-3">
+    {{ currentYear + '© DigiCred Holdings' }}
   </div>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useConfigStore } from '../../store';
+// import { storeToRefs } from 'pinia';
+// import { useConfigStore } from '../../store';
 
-const { config } = storeToRefs(useConfigStore());
+// const { config } = storeToRefs(useConfigStore());
+const currentYear = new Date().getFullYear();
 </script>
 
-<style>
+<style lang="scss" scoped>
 .traction-footer {
-  background-color: white !important;
-  color: black !important;
+  background-color: #f5f5f5 !important;
   font-size: 0.7em;
-  padding: 0 2em;
-  border-top: 1px solid grey;
+  color: $tenant-ui-new-text-on-primary;
 }
 </style>
