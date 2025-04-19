@@ -45,6 +45,8 @@ import axios from 'axios';
 import Card from '@/components/dashbaord/Card.vue';
 import Chart from '@/components/dashbaord/Chart.vue';
 import { computed, onMounted, ref } from 'vue';
+import { useTenantStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
 interface SummaryItem {
   kind: 'Credential' | 'Transcript' | 'Message' | 'Connection';
@@ -53,6 +55,8 @@ interface SummaryItem {
 
 const apiStatus = ref('Loading wallet data...');
 const summary = ref<SummaryItem[]>([]);
+const tenantStore = useTenantStore();
+const { tenantWallet } = storeToRefs(useTenantStore());
 
 const totalItems = computed(() =>
   summary.value.reduce((total, item) => total + item.count, 0)
@@ -60,8 +64,17 @@ const totalItems = computed(() =>
 
 onMounted(async () => {
   console.log('Dashboard component mounted');
+  await loadTenantSettings();
   fetchSummaryData();
 });
+
+const loadTenantSettings = async () => {
+  try {
+    await tenantStore.getTenantSubWallet();
+  } catch (error) {
+    console.error('Failed to load tenant settings:', error);
+  }
+};
 
 const fetchSummaryData = async () => {
   try {

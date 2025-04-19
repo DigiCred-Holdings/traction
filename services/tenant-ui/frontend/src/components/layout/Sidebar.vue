@@ -1,13 +1,12 @@
 <template>
   <div class="traction-sidebar">
-    <!-- <h1 class="sidebar-app-title">
-      <ProgressSpinner v-if="loading" />
-      <span v-if="tenant">{{ tenant.tenant_name }}</span>
-    </h1> -->
-    <img src="/img/digicred/logo-menu-top.png" class="logo-menu-top" />
-    <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
-    <!-- <h1 class="sidebar-app-title small">T</h1> -->
-    <PanelMenu :model="sidebarItems" class="mt-5">
+    <div v-if="imageUrl" class="sidebar-logo">
+      <img :src="imageUrl" class="logo-menu-top" />
+    </div>
+    <div v-else class="sidebar-wallet-name">
+      {{ walletName }}
+    </div>
+    <PanelMenu :model="sidebarItems" class="mt-4">
       <template #item="{ item }">
         <PanelMenuItemLink :item="item" />
       </template>
@@ -18,15 +17,22 @@
 <script setup lang="ts">
 import PanelMenu from 'primevue/panelmenu';
 import PanelMenuItemLink from '../common/PanelMenuItemLink.vue';
-import ProgressSpinner from 'primevue/progressspinner';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import { useConfigStore, useTenantStore } from '../../store';
+import { computed } from 'vue';
 
 const { t } = useI18n();
 const { config } = useConfigStore();
-// tenant should be loaded by login...
-const { tenant, loading } = storeToRefs(useTenantStore());
+const { tenant, loading, tenantWallet } = storeToRefs(useTenantStore());
+
+const imageUrl = computed(() => {
+  return tenantWallet.value?.settings?.image_url || null;
+});
+
+const walletName = computed(() => {
+  return tenantWallet.value?.settings['wallet.name'] || null;
+});
 
 const sidebarItems = [
   {
@@ -44,7 +50,6 @@ const sidebarItems = [
     icon: 'pi pi-fw pi-users',
     items: [
       {
-        // Icons are manadatory for mobile layout
         label: t('connect.connections.connections'),
         icon: 'pi pi-fw pi-users',
         route: '/connections',
@@ -61,19 +66,16 @@ const sidebarItems = [
     icon: 'pi pi-fw pi-angle-double-up',
     route: '/bulkIssue',
   },
-
   {
     label: t('issue.issuance'),
     icon: 'pi pi-fw pi-credit-card',
     route: '/issuance/credentials',
   },
-
   {
     label: t('verify.verification'),
     icon: 'pi pi-fw pi-check-square',
     route: '/verification/verifications',
   },
-
   {
     label: t('common.credentials'),
     icon: 'pi pi-fw pi-wallet',
@@ -84,7 +86,6 @@ const sidebarItems = [
     icon: 'pi pi-fw pi-book',
     route: '/transcript',
   },
-
   {
     label: t('configuration.configuration'),
     icon: 'pi pi-fw pi-file',
@@ -106,13 +107,11 @@ const sidebarItems = [
       },
     ],
   },
-
   {
     label: t('messages.messages'),
     icon: 'pi pi-fw pi-envelope',
     route: '/messages/recent',
   },
-
   {
     label: t('about.about'),
     icon: 'pi pi-fw pi-question-circle',
@@ -128,9 +127,25 @@ if (config?.frontend?.logStreamUrl) {
   });
 }
 </script>
+
 <style lang="scss">
-.logo-menu-top {
-  display: block;
-  margin-top: 10px;
+.traction-sidebar {
+  .sidebar-logo {
+    .logo-menu-top {
+      width: 100%;
+      max-height: 100px;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+
+  .sidebar-wallet-name {
+    padding: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $tenant-ui-new-text-on-primary;
+    word-break: break-word;
+  }
 }
 </style>
