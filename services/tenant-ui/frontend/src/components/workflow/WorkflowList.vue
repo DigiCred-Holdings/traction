@@ -1,58 +1,68 @@
 <template>
-  <div v-if="workflows.length === 0" class="flex justify-content-center align-items-center h-full">
+  <div
+    v-if="workflows.length === 0"
+    class="flex justify-content-center align-items-center h-full"
+  >
     <p class="text-2xl font-bold">{{ $t('common.noRecordsFound') }}</p>
   </div>
 
   <DataTable
-      v-else
-      v-model:expanded-rows="expandedRows"
-      v-model:filters="filter"
-      :loading="loading"
-      :value="workflows"
-      :paginator="true"
-      :rows="TABLE_OPT.ROWS_DEFAULT"
-      :rows-per-page-options="TABLE_OPT.ROWS_OPTIONS"
-      :global-filter-fields="['name']"
-      selection-mode="single"
-      data-key="workflowId"
-      sort-field="name"
-      :sort-order="-1"
-      filter-display="menu"
+    v-else
+    v-model:expanded-rows="expandedRows"
+    v-model:filters="filter"
+    :loading="loading"
+    :value="workflows"
+    :paginator="true"
+    :rows="TABLE_OPT.ROWS_DEFAULT"
+    :rows-per-page-options="TABLE_OPT.ROWS_OPTIONS"
+    :global-filter-fields="['name']"
+    selection-mode="single"
+    data-key="workflowId"
+    sort-field="name"
+    :sort-order="-1"
+    filter-display="menu"
+  >
+    <template #header>
+      <div class="flex flex-wrap justify-content-between">
+        <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
+        <span class="text-xl font-bold">Workflow List</span>
+        <Button
+          :label="$t('workflow.add')"
+          icon="pi pi-plus"
+          @click="$emit('add', webHookUrl)"
+          class="p-button"
+          icon-pos="right"
+        />
+      </div>
+    </template>
+    <template #empty>{{ $t('common.noRecordsFound') }}</template>
+    <template #loading>{{ $t('common.loading') }}</template>
+    <Column
+      :sortable="true"
+      field="name"
+      :header="$t('common.name')"
+      filter-field="name"
+      :show-filter-match-modes="false"
     >
-      <template #header>
-        <div class="flex flex-wrap justify-content-between">
-         <span class="text-xl font-bold">Workflow List</span>
-        <Button :label="$t('workflow.add')" icon="pi pi-plus" @click="$emit('add',webHookUrl)" class="p-button" icon-pos="right"/>
-        </div>
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          class="p-column-filter"
+          placeholder="Search By Name"
+          @input="filterCallback()"
+        />
       </template>
-      <template #empty>{{ $t('common.noRecordsFound') }}</template>
-      <template #loading>{{ $t('common.loading') }}</template>
-      <Column
-        :sortable="true"
-        field="name"
-        :header="$t('common.name')"
-        filter-field="name"
-        :show-filter-match-modes="false"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            class="p-column-filter"
-            placeholder="Search By Name"
-            @input="filterCallback()"
-          />
-        </template>
-      </Column>
-      <Column
-        :sortable="true"
-        field="createdAt"
-        :header="$t('common.createdAt')"
-        filter-field="createdAt"
-        :show-filter-match-modes="false"
-      >
-      </Column>
-      <!-- <Column
+    </Column>
+    <Column
+      :sortable="true"
+      field="createdAt"
+      :header="$t('common.createdAt')"
+      filter-field="createdAt"
+      :show-filter-match-modes="false"
+    >
+    </Column>
+    <!-- <Column
         :sortable="true"
         field="status"
         :header="$t('common.status')"
@@ -72,79 +82,85 @@
           />
         </template>
       </Column> -->
-      <Column :sortable="false" :header = "$t('common.actions')">
-        <template #body="{ data }">
-          <Button
-          icon="pi pi-pencil" rounded :szie="large" 
+    <Column :sortable="false" :header="$t('common.actions')">
+      <template #body="{ data }">
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          :szie="large"
           class="p-button-text"
-          @click="$emit('edit', data ,webHookUrl)" />
-        </template>  
-      </Column>
-    </DataTable>
+          @click="$emit('edit', data, webHookUrl)"
+        />
+      </template>
+    </Column>
+  </DataTable>
 </template>
-  <script setup>
-  import { ref, onMounted,defineEmits, defineProps } from 'vue';
-  import { FilterMatchMode } from 'primevue/api';
-  import { useToast } from 'vue-toastification';
-  import { useTenantStore } from '@/store';
-  import { storeToRefs } from 'pinia';
-  import Button from 'primevue/button';
-  import Column from 'primevue/column';
-  import DataTable from 'primevue/datatable';
-  import InputText from 'primevue/inputtext';
-  import { TABLE_OPT } from '@/helpers/constants';
+<script setup>
+import { ref, onMounted, defineEmits, defineProps } from 'vue';
+import { FilterMatchMode } from 'primevue/api';
+import { useToast } from 'vue-toastification';
+import { useTenantStore } from '@/store';
+import { storeToRefs } from 'pinia';
+import Button from 'primevue/button';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import InputText from 'primevue/inputtext';
+import { TABLE_OPT } from '@/helpers/constants';
 
-  const workflows = ref([]);
-  const toast = useToast();
+// eslint-disable-next-line vue/no-dupe-keys
+const workflows = ref([]);
+const toast = useToast();
 
-  defineProps({
-    workflows: Array,
-  });
+defineProps({
+  workflows: Array,
+});
 
-  defineEmits(['edit', 'add']);
+defineEmits(['edit', 'add']);
 
-  const { tenantWallet } = storeToRefs(useTenantStore());
-  const tenantStore = useTenantStore();
-  const webHookUrl = ref(null);
+const { tenantWallet } = storeToRefs(useTenantStore());
+const tenantStore = useTenantStore();
+const webHookUrl = ref(null);
 
-  const loadTenantSettings = async () => {
-    try{
+const loadTenantSettings = async () => {
+  try {
     await tenantStore.getTenantSubWallet();
     const webhookUrls = tenantWallet.value?.settings?.['wallet.webhook_urls'];
     if (webhookUrls && webhookUrls.length > 0) {
       webHookUrl.value = webhookUrls[0];
     } else {
-      console.error("No webhook URLs found in tenant settings");
-      toast.error("No webhook URLs found in tenant settings");
+      console.error('No webhook URLs found in tenant settings');
+      toast.error('No webhook URLs found in tenant settings');
     }
-    } catch (err) {
-      console.error(err);
-      toast.error(`Failure: ${err}`);
-    }
-  };
-
-  const fetchWorkflows = async () => {
-    try {      
-        if (webHookUrl.value) {
-        const response = await fetch(`${webHookUrl.value}/workflow/get-workflows`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        workflows.value = await response.json();
-        console.log(response);
-        }
-    } catch (error) {
-        console.error('Error fetching workflows:', error);
-        workflows.value = [{}]; 
-    };
+  } catch (err) {
+    console.error(err);
+    toast.error(`Failure: ${err}`);
   }
+};
 
-  onMounted(async ()=>{
-    await loadTenantSettings();
-    await fetchWorkflows();
-  });
+const fetchWorkflows = async () => {
+  try {
+    if (webHookUrl.value) {
+      const response = await fetch(
+        `${webHookUrl.value}/workflow/get-workflows`
+      );
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      workflows.value = await response.json();
+      console.log(response);
+    }
+  } catch (error) {
+    console.error('Error fetching workflows:', error);
+    workflows.value = [{}];
+  }
+};
 
-  const filter = ref({
+onMounted(async () => {
+  await loadTenantSettings();
+  await fetchWorkflows();
+});
+
+const filter = ref({
   name: {
     value: null,
     matchMode: FilterMatchMode.CONTAINS,
@@ -158,29 +174,48 @@
     matchMode: FilterMatchMode.CONTAINS,
   },
 });
-  </script>
-  
-  <style scoped>
-  .container { padding: 20px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-  .badge-active { color: #000000;
-    background: #bbe9bb;
-    border-radius: 20px;
-    height: 26px;
-    width: 70px;
-    display: inline-block;
-    text-align: center;
-    line-height: 25px; }
-  .badge-inactive {  color: #000000;
-    background: #e9bbbb;
-    border-radius: 20px;
-    height: 26px;
-    width: 70px;
-    display: inline-block;
-    text-align: center;
-    line-height: 25px;   /* font-weight: 700; */
-  }
-  .btn-primary { padding: 8px 12px; background: #3c5973; color: white; border: none; cursor: pointer; }
-  </style>
-  
+</script>
+
+<style scoped>
+.container {
+  padding: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th,
+td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.badge-active {
+  color: #000000;
+  background: #bbe9bb;
+  border-radius: 20px;
+  height: 26px;
+  width: 70px;
+  display: inline-block;
+  text-align: center;
+  line-height: 25px;
+}
+.badge-inactive {
+  color: #000000;
+  background: #e9bbbb;
+  border-radius: 20px;
+  height: 26px;
+  width: 70px;
+  display: inline-block;
+  text-align: center;
+  line-height: 25px; /* font-weight: 700; */
+}
+.btn-primary {
+  padding: 8px 12px;
+  background: #3c5973;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>

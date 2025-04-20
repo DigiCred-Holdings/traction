@@ -60,8 +60,8 @@ const tenantRoutes: RouteRecordRaw[] = [
         meta: { title: 'Onboarding' },
       },
       {
-        path:'/workflow-list',
-        name:'Workflows',
+        path: '/workflow-list',
+        name: 'Workflows',
         component: Workflows,
       },
       // About
