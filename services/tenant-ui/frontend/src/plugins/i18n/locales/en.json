@@ -21,6 +21,10 @@
     "pleaseEnterTheStudent": "Please enter the student ID to generate a QR code that is used to onboard a student.",
     "reset": "Reset"
   },
+  "workflow":{
+    "workflow": "Workflow",
+    "add": "Add Workflow"
+  },
   "bulkIssue": {
     "bulkIssue": "Bulk Issue",
     "totalConnections": "Total Connections: {count}",
