@@ -1,352 +1,392 @@
-
-  <template>
-    <div class="header">
-      <Button label="Back" icon="pi pi-angle-left" class="pi-button" @click="$emit('back')" />
-      <h2>{{ update ? 'Edit Workflow' : 'Create New Workflow' }}</h2>
-    </div>
-    <div class="json-panel-container">
-      <!-- Left Panel -->
-      <div class="json-panel" ref="leftPane">
-        <div class="toolbar">
-          <span class="title">{{workflowName}}</span>
-        </div>
-  
-        <div class="json-editor">
-          <JsonEditorVue v-bind="jsonEditorSettings" v-model="jsonData" @update:modelValue="onEditorUpdate" :stringified="false" style="height: 65vh;" />
-        </div>
-      </div>
-      <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
-      <!-- Right Panel -->
-      <div class="render-panel" ref="topRightPane">
-        <div class="workflow-card">
-             {{ console.log(`WorkflowEditor: ${jsonData.name}:`, JSON.stringify(jsonData, null, 2)) }}
-             <WorkflowCard :data="workflowData"/>
-             <div class="spacer" style="height:1px"></div>
-        </div>
-        <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
-        <div class="bottom" ref="bottomRightPane">
-          <Button label="Reset-UI" icon="pi pi-refresh" class="pi-button" @click="reset" />
-          <Button label="Save" icon="pi pi-save" class="pi-button" @click="save" />
-        </div>
-      </div>
-
+<template>
+  <div class="header">
+    <Button
+      label="Back"
+      icon="pi pi-angle-left"
+      class="pi-button"
+      @click="$emit('back')"
+    />
+    <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
+    <h2>{{ update ? 'Edit Workflow' : 'Create New Workflow' }}</h2>
   </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, watch, computed } from "vue";
-  import JsonEditorVue from "json-editor-vue";
-  import WorkflowCard from "@/components/workflow/WorkflowRender.vue";
-  import Button from "primevue/button";
-  import { Workflow,State } from "@/types/workflow";
-  import { useToast } from "vue-toastification";
-  const emit = defineEmits(['back']);
-  const toast = useToast();
-  const {workflow,webhookUrl,update} = defineProps({
-    workflow: {
-      type: Object as () => Workflow,
-      required: true,
-    },
-    webhookUrl: {
-      type: String,
-    },
-    update:{
-      type: Boolean,
-    }
-  });
+  <div class="json-panel-container">
+    <!-- Left Panel -->
+    <div class="json-panel" ref="leftPane">
+      <div class="toolbar">
+        <span class="title">{{ workflowName }}</span>
+      </div>
 
-  console.log("inside WorkflowEditor: ",workflow);
+      <div class="json-editor">
+        <JsonEditorVue
+          v-bind="jsonEditorSettings"
+          v-model="jsonData"
+          @update:modelValue="onEditorUpdate"
+          :stringified="false"
+          style="height: 65vh"
+        />
+      </div>
+    </div>
+    <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
+    <!-- Right Panel -->
+    <div class="render-panel" ref="topRightPane">
+      <div class="workflow-card">
+        {{
+          console.log(
+            `WorkflowEditor: ${jsonData.name}:`,
+            JSON.stringify(jsonData, null, 2)
+          )
+        }}
+        <WorkflowCard :data="workflowData" />
+        <div class="spacer" style="height: 1px"></div>
+      </div>
+      <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
+      <div class="bottom" ref="bottomRightPane">
+        <Button
+          label="Reset-UI"
+          icon="pi pi-refresh"
+          class="pi-button"
+          @click="reset"
+        />
+        <Button
+          label="Save"
+          icon="pi pi-save"
+          class="pi-button"
+          @click="save"
+        />
+      </div>
+    </div>
+  </div>
+</template>
 
-  const jsonEditorSettings = {
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue';
+import JsonEditorVue from 'json-editor-vue';
+import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
+import Button from 'primevue/button';
+import { Workflow, State } from '@/types/workflow';
+import { useToast } from 'vue-toastification';
+const emit = defineEmits(['back']);
+const toast = useToast();
+const { workflow, webhookUrl, update } = defineProps({
+  workflow: {
+    type: Object as () => Workflow,
+    required: true,
+  },
+  webhookUrl: {
+    type: String,
+  },
+  update: {
+    type: Boolean,
+  },
+});
+
+console.log('inside WorkflowEditor: ', workflow);
+
+const jsonEditorSettings = {
   mainMenuBar: true,
   mode: 'text' as any,
   statusBar: true,
   navigationBar: true,
   indentation: 2,
   tabSize: 2,
-  };
-  const jsonData = ref<Workflow>(JSON.parse(JSON.stringify(workflow)));
+};
+const jsonData = ref<Workflow>(JSON.parse(JSON.stringify(workflow)));
 
-  console.log("WorkflowEditor: Initial jsonData:", JSON.stringify(jsonData, null, 2));
+console.log(
+  'WorkflowEditor: Initial jsonData:',
+  JSON.stringify(jsonData, null, 2)
+);
 
-  const workflowData = computed(() => (jsonData.value??{}) as Workflow);
+const workflowData = computed(() => (jsonData.value ?? {}) as Workflow);
 
-  console.log("WorkflowEditor: Initial data computed:", JSON.stringify(workflowData.value, null, 2));
+console.log(
+  'WorkflowEditor: Initial data computed:',
+  JSON.stringify(workflowData.value, null, 2)
+);
 
-  // Computed property for the name to help with template type inference
-  const workflowName = computed(() => jsonData.value.name);
+// Computed property for the name to help with template type inference
+const workflowName = computed(() => jsonData.value.name);
 
-  /** Called every time <JsonEditorVue> emits update:modelValue */
-  const onEditorUpdate = (val: Workflow | string) => {
-    console.log('JSON updated ➡️', val);
-  };
+/** Called every time <JsonEditorVue> emits update:modelValue */
+const onEditorUpdate = (val: Workflow | string) => {
+  console.log('JSON updated ➡️', val);
+};
 
-  // Watcher for side-effects (or additional debugging)
-  watch(
-    jsonData,
-    (newValue, oldValue) => {
-      console.log('Deep watch ➡️ ', newValue);
-    }, 
-    { deep: true } 
-  );
-  
-  // const leftPane = ref<HTMLElement|null>(null)
-  // const topRightPane = ref<HTMLElement|null>(null)
-  // const bottomRightPane = ref<HTMLElement|null>(null)
+// Watcher for side-effects (or additional debugging)
+watch(
+  jsonData,
+  (newValue, oldValue) => {
+    console.log('Deep watch ➡️ ', newValue);
+  },
+  { deep: true }
+);
 
-  // let isResizing = false
-  // let isVertical = true
-  // let scrollState = { top: 0, left: 0 }
+// const leftPane = ref<HTMLElement|null>(null)
+// const topRightPane = ref<HTMLElement|null>(null)
+// const bottomRightPane = ref<HTMLElement|null>(null)
 
-  // const LEFT_WIDTH_KEY = 'leftPaneWidth'
-  // const TOP_RIGHT_HEIGHT_KEY = 'topRightPaneHeight'
+// let isResizing = false
+// let isVertical = true
+// let scrollState = { top: 0, left: 0 }
 
-  // function startResize(e: MouseEvent, direction: 'vertical' | 'horizontal') {
-  //   isResizing = true
-  //   isVertical = direction === 'vertical'
+// const LEFT_WIDTH_KEY = 'leftPaneWidth'
+// const TOP_RIGHT_HEIGHT_KEY = 'topRightPaneHeight'
 
-  //   const targetPane = isVertical ? leftPane.value : topRightPane.value
-  //   if (targetPane) {
-  //     scrollState.left = targetPane.scrollLeft
-  //     scrollState.top = targetPane.scrollTop
-  //   }
+// function startResize(e: MouseEvent, direction: 'vertical' | 'horizontal') {
+//   isResizing = true
+//   isVertical = direction === 'vertical'
 
-  //   document.addEventListener('mousemove', handleMouseMove)
-  //   document.addEventListener('mouseup', stopResize)
-  // }
+//   const targetPane = isVertical ? leftPane.value : topRightPane.value
+//   if (targetPane) {
+//     scrollState.left = targetPane.scrollLeft
+//     scrollState.top = targetPane.scrollTop
+//   }
 
-  // function handleMouseMove(e:MouseEvent) {
-  // if (!isResizing) return
+//   document.addEventListener('mousemove', handleMouseMove)
+//   document.addEventListener('mouseup', stopResize)
+// }
 
-  // if (isVertical && leftPane.value) {
-  //   const newWidth = e.clientX
-  //   leftPane.value.style.flexBasis = `${newWidth}px`
-  //   localStorage.setItem(LEFT_WIDTH_KEY, newWidth.toString())
+// function handleMouseMove(e:MouseEvent) {
+// if (!isResizing) return
 
-  //   leftPane.value.scrollLeft = scrollState.left
-  //   leftPane.value.scrollTop = scrollState.top
-  // } else if (!isVertical && topRightPane.value) {
-  //   const containerTop = topRightPane.value.parentElement?.getBoundingClientRect().top || 0
-  //   const newHeight = e.clientY - containerTop
-  //   topRightPane.value.style.flexBasis = `${newHeight}px`
-  //   localStorage.setItem(TOP_RIGHT_HEIGHT_KEY, newHeight.toString())
+// if (isVertical && leftPane.value) {
+//   const newWidth = e.clientX
+//   leftPane.value.style.flexBasis = `${newWidth}px`
+//   localStorage.setItem(LEFT_WIDTH_KEY, newWidth.toString())
 
-  //   topRightPane.value.scrollLeft = scrollState.left
-  //   topRightPane.value.scrollTop = scrollState.top
-  // }
-  // }
+//   leftPane.value.scrollLeft = scrollState.left
+//   leftPane.value.scrollTop = scrollState.top
+// } else if (!isVertical && topRightPane.value) {
+//   const containerTop = topRightPane.value.parentElement?.getBoundingClientRect().top || 0
+//   const newHeight = e.clientY - containerTop
+//   topRightPane.value.style.flexBasis = `${newHeight}px`
+//   localStorage.setItem(TOP_RIGHT_HEIGHT_KEY, newHeight.toString())
 
-  // function stopResize() {
-  //   isResizing = false
-  //   document.removeEventListener('mousemove', handleMouseMove)
-  //   document.removeEventListener('mouseup', stopResize)
-  // }
+//   topRightPane.value.scrollLeft = scrollState.left
+//   topRightPane.value.scrollTop = scrollState.top
+// }
+// }
 
-  // onMounted(() => {
-  //   // Restore dimensions from localStorage
-  //   const leftWidth = localStorage.getItem(LEFT_WIDTH_KEY)
-  //   if (leftWidth && leftPane.value) {
-  //     leftPane.value.style.flexBasis = `${leftWidth}px`
-  //   }
+// function stopResize() {
+//   isResizing = false
+//   document.removeEventListener('mousemove', handleMouseMove)
+//   document.removeEventListener('mouseup', stopResize)
+// }
 
-  //   const topHeight = localStorage.getItem(TOP_RIGHT_HEIGHT_KEY)
-  //   if (topHeight && topRightPane.value) {
-  //     topRightPane.value.style.flexBasis = `${topHeight}px`
-  //   }
-  // })
+// onMounted(() => {
+//   // Restore dimensions from localStorage
+//   const leftWidth = localStorage.getItem(LEFT_WIDTH_KEY)
+//   if (leftWidth && leftPane.value) {
+//     leftPane.value.style.flexBasis = `${leftWidth}px`
+//   }
 
-  // onBeforeUnmount(() => stopResize())
+//   const topHeight = localStorage.getItem(TOP_RIGHT_HEIGHT_KEY)
+//   if (topHeight && topRightPane.value) {
+//     topRightPane.value.style.flexBasis = `${topHeight}px`
+//   }
+// })
 
-  const reset = () => {
-    const newData = JSON.parse(JSON.stringify(jsonData.value));
-    newData.initial_state="menu" // Update the reactive `jsonData` to trigger re-render
-    Object.assign(workflowData.value,newData)
-    console.log("Workflow refreshed with new data:", workflowData.value);
+// onBeforeUnmount(() => stopResize())
+
+const reset = () => {
+  const newData = JSON.parse(JSON.stringify(jsonData.value));
+  newData.initial_state = 'menu'; // Update the reactive `jsonData` to trigger re-render
+  Object.assign(workflowData.value, newData);
+  console.log('Workflow refreshed with new data:', workflowData.value);
+};
+
+const save = async () => {
+  // Create a clean, non-proxied copy of the current data
+  let dataToSave;
+  try {
+    dataToSave = JSON.parse(JSON.stringify(jsonData.value));
+  } catch (error) {
+    console.error('Error creating clean data copy for saving:', error);
+    toast.error('Error preparing data for saving: Invalid JSON format.');
+    return; // Stop if data is not valid JSON
   }
 
-  const save = async () => {
-    // Create a clean, non-proxied copy of the current data
-    let dataToSave;
-    try {
-      dataToSave = JSON.parse(JSON.stringify(jsonData.value));
-    } catch (error) {
-      console.error('Error creating clean data copy for saving:', error);
-      toast.error('Error preparing data for saving: Invalid JSON format.');
-      return; // Stop if data is not valid JSON
+  // Removed: Object.assign(jsonData,newData) - This was likely causing the error
+  console.log('update:', update);
+  console.log('Saving data:', JSON.stringify(dataToSave, null, 2)); // Log the data being sent
+
+  try {
+    if (webhookUrl) {
+      const endpoint = update
+        ? `${webhookUrl}/workflow/update-workflow`
+        : `${webhookUrl}/workflow/set-workflow`;
+      const method = update ? 'PUT' : 'POST'; // Use PUT for update, POST for create
+
+      console.log(`Sending request to ${endpoint} with method ${method}`);
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSave), // Use the clean data copy
+      });
+      if (!response.ok) {
+        const errorBody = await response.text(); // Read error response body
+        console.error(
+          'Network response was not ok:',
+          response.status,
+          errorBody
+        );
+        throw new Error(
+          `Network response was not ok: ${response.status} ${errorBody}`
+        );
+      }
+      const successMessage = update
+        ? 'Workflow Updated Successfully'
+        : 'Workflow Created Successfully';
+      toast.success(successMessage);
+      console.log(
+        update ? 'Workflow Data Updated:' : 'Workflow Data Saved:',
+        dataToSave
+      );
+    } else {
+      console.error('Webhook URL is missing, cannot save.');
+      toast.error('Cannot save workflow: Webhook URL is missing.');
     }
-
-    // Removed: Object.assign(jsonData,newData) - This was likely causing the error
-    console.log("update:", update);
-    console.log("Saving data:", JSON.stringify(dataToSave, null, 2)); // Log the data being sent
-
-    try {      
-        if (webhookUrl ) {
-          const endpoint = update ? `${webhookUrl}/workflow/update-workflow` : `${webhookUrl}/workflow/set-workflow`;
-          const method = update ? 'PUT' : 'POST'; // Use PUT for update, POST for create
-          
-          console.log(`Sending request to ${endpoint} with method ${method}`);
-          const response = await fetch(endpoint, { 
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToSave), // Use the clean data copy
-          });
-          if (!response.ok) {
-            const errorBody = await response.text(); // Read error response body
-            console.error('Network response was not ok:', response.status, errorBody);
-            throw new Error(`Network response was not ok: ${response.status} ${errorBody}`);
-          }
-          const successMessage = update ? "Workflow Updated Successfully" : "Workflow Created Successfully";
-          toast.success(successMessage);
-          console.log(update ? "Workflow Data Updated:" : "Workflow Data Saved:", dataToSave);
-        } else {
-          console.error('Webhook URL is missing, cannot save.');
-          toast.error('Cannot save workflow: Webhook URL is missing.');
-        }
-    } catch (error) {
-        console.error('Error updating workflow:', error);
-         toast.error(`Error updating workflow: ${error}`);
-    };
+  } catch (error) {
+    console.error('Error updating workflow:', error);
+    toast.error(`Error updating workflow: ${error}`);
   }
-    
-  watch(
+};
+
+watch(
   () => jsonData.value.name,
   (newVal) => {
-    console.log('Workflow name changed:', newVal)
+    console.log('Workflow name changed:', newVal);
   }
-  )
+);
+</script>
 
-  </script>
-  
-  <style scoped>
-  .header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
+<style scoped>
+.header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
 
-  .json-panel-container {
-    display: flex;
-    gap: 10px;
-    justify-content: space-between;
-    background: #f4f4f9;
-    padding: 1% 0;
-  }
+.json-panel-container {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  background: #f4f4f9;
+  padding: 1% 0;
+}
 
+.json-panel {
+  overflow: auto;
+  background: #6666cc;
+  border-radius: 3px 0 0 3px;
+  color: white;
+  box-sizing: border-box;
+  position: relative;
+  height: 100%;
+  width: 60vw;
+  margin: 0 auto;
+}
 
-  .json-panel {
-    overflow: auto;
-    background: #6666CC;
-    border-radius: 3px 0 0 3px;
-    color: white;
-    box-sizing: border-box;
-    position: relative;
-    height: 100%;
-    width: 60vw;
-    margin: 0 auto;
-  }
+.json-editor {
+  background: white;
+  color: black;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 3px;
+  --jse-theme-color: #6666ccea;
+  --jse-theme-color-highlight: #5a5ab0;
+}
 
-  .json-editor {
-    background: white;
-    color: black;
-    max-height: 100%;
-    max-width: 100%;
-    border-radius: 3px;
-    --jse-theme-color: #6666ccea;
-    --jse-theme-color-highlight: #5a5ab0;
-  }
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 8px 8px;
+}
 
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0 8px 8px;
-  }
+.render-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background: #f4f4f9;
+  height: 70%;
+}
 
-  .render-panel {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    background: #f4f4f9;
-    height: 70%;
-  }
+.workflow-card {
+  padding: 10px;
+  overflow: auto;
+  background: #f4f4f9;
+  border-radius: 0 4px 0 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
 
-  .workflow-card {
-    padding:10px;
-    overflow: auto;
-    background: #f4f4f9;
-    border-radius: 0 4px 0 0;
-    display: flex;
-    width:100%;
-    justify-content: center;
-  }
+.bottom {
+  display: flex;
+  overflow: auto;
+  background: #f4f4f9;
+  border-radius: 0 0 4px;
+  gap: 10px;
+  padding: 20px;
+  justify-content: space-evenly;
+}
+.bottom button {
+  flex: 1;
+  margin: 0 5px;
+}
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  .bottom {
-    display: flex;
-    overflow: auto;
-    background: #f4f4f9;
-    border-radius: 0 0 4px;
-    gap: 10px;
-    padding: 20px;
-    justify-content: space-evenly;
-  }
-  .bottom button {
-    flex: 1;
-    margin: 0 5px;
-  }
-  .title {
-    font-size: 18px;
-    font-weight: bold;
-  }
+.actions {
+  display: flex;
+  gap: 5px;
+}
 
-  .actions {
-    display: flex;
-    gap: 5px;
-  }
+.editor-tabs {
+  margin-top: 10px;
+}
 
-  .editor-tabs {
-    margin-top: 10px;
-  }
+.editor-tabs button {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+}
 
-  .editor-tabs button {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
+.editor-tabs button.active {
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}
 
-  .editor-tabs button.active {
-    font-weight: bold;
-    border-bottom: 2px solid white;
-  }
+.resizer {
+  background: #aaa;
+  z-index: 10;
+}
 
-  .resizer {
-    background: #aaa;
-    z-index: 10;
-  }
+.resizer.vertical {
+  width: 5px;
+  cursor: col-resize;
+}
 
-  .resizer.vertical {
-    width: 5px;
-    cursor: col-resize;
-  }
+.resizer.horizontal {
+  height: 5px;
+  cursor: row-resize;
+}
 
-  .resizer.horizontal {
-    height: 5px;
-    cursor: row-resize;
-  }
-
-  .json-textarea {
-    width: 100%;
-    height: 200px;
-    font-family: monospace;
-    border: none;
-    outline: none;
-  }
-
-
+.json-textarea {
+  width: 100%;
+  height: 200px;
+  font-family: monospace;
+  border: none;
+  outline: none;
+}
 </style>

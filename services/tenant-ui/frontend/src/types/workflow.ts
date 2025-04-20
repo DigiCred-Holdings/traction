@@ -31,21 +31,21 @@ export interface Transition {
 
 export type DisplayData =
   | {
-      type: "image";
+      type: 'image';
       url: string;
     }
   | {
-      type: "text";
+      type: 'text';
       text: string;
-      display?: "title";
+      display?: 'title';
       condition?: string;
     }
   | {
-      type: "extended";
+      type: 'extended';
       text: string;
     }
   | {
-      type: "button";
+      type: 'button';
       label: string;
       actionID: string;
     };

@@ -67,6 +67,7 @@
             class="pt-4 transcriptContent"
           >
             <!-- TODO: 'v-html' directive can lead to XSS attack. -->
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <div class="taa-html mb-4" v-html="svg?.data" />
             <!-- <Card>
               <template #content>
