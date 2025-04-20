@@ -36,7 +36,6 @@
     "primevue": "^3.53.0",
     "qrcode.vue": "^3.6.0",
     "socket.io-client": "^4.7.5",
-    "tenant-ui-frontend": "file:",
     "vue": "^3.5.12",
     "vue-i18n": "^11.1.1",
     "vue-json-pretty": "^2.4.0",
