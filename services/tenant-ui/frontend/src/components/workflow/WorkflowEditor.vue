@@ -6,12 +6,11 @@
       class="pi-button"
       @click="$emit('back')"
     />
-    <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
-    <h2>{{ update ? 'Edit Workflow' : 'Create New Workflow' }}</h2>
+    <h2>{{ update ? $t('workflow.edit') : $t('workflow.create') }}</h2>
   </div>
   <div class="json-panel-container">
     <!-- Left Panel -->
-    <div class="json-panel" ref="leftPane">
+    <div ref="leftPane" class="json-panel">
       <div class="toolbar">
         <span class="title">{{ workflowName }}</span>
       </div>
@@ -20,15 +19,15 @@
         <JsonEditorVue
           v-bind="jsonEditorSettings"
           v-model="jsonData"
-          @update:modelValue="onEditorUpdate"
           :stringified="false"
           style="height: 65vh"
+          @update:modelValue="onEditorUpdate"
         />
       </div>
     </div>
     <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
     <!-- Right Panel -->
-    <div class="render-panel" ref="topRightPane">
+    <div ref="topRightPane" class="render-panel">
       <div class="workflow-card">
         {{
           console.log(
@@ -40,7 +39,7 @@
         <div class="spacer" style="height: 1px"></div>
       </div>
       <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
-      <div class="bottom" ref="bottomRightPane">
+      <div ref="bottomRightPane" class="bottom">
         <Button
           label="Reset-UI"
           icon="pi pi-refresh"
@@ -60,11 +59,12 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { Workflow } from '@/types/workflow';
+import { useToast } from 'vue-toastification';
 import JsonEditorVue from 'json-editor-vue';
 import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
 import Button from 'primevue/button';
-import { Workflow, State } from '@/types/workflow';
-import { useToast } from 'vue-toastification';
+
 const emit = defineEmits(['back']);
 const toast = useToast();
 const { workflow, webhookUrl, update } = defineProps({
@@ -74,6 +74,7 @@ const { workflow, webhookUrl, update } = defineProps({
   },
   webhookUrl: {
     type: String,
+    default: null,
   },
   update: {
     type: Boolean,

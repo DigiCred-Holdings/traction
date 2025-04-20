@@ -23,7 +23,10 @@
   },
   "workflow":{
     "workflow": "Workflow",
-    "add": "Add Workflow"
+    "add": "Add Workflow",
+    "list": "Workflow List",
+    "create": "Create Workflow",
+    "edit": "Edit Workflow"
   },
   "bulkIssue": {
     "bulkIssue": "Bulk Issue",
