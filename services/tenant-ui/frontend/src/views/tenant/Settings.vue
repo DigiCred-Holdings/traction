@@ -126,6 +126,7 @@
                       id="webhookKey"
                       v-model="webhook.webhookKey"
                       :placeholder="$t('profile.webHookKey')"
+                      toggle-mask
                       :feedback="false"
                       class="flex-grow-1"
                     />
