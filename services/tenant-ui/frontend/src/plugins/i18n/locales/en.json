@@ -636,5 +636,12 @@
   },
   "log": {
     "log": "Log"
+  },
+  "settings": {
+    "tenantProfile": "Tenant Profile",
+    "profileInformation": "Profile information",
+    "walletInformation": "Wallet Information",
+    "walletDetails": "Wallet details",
+    "logoUrl": "Logo URL"
   }
 }

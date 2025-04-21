@@ -85,6 +85,7 @@ const tenantRoutes: RouteRecordRaw[] = [
             path: 'settings',
             name: 'Settings',
             component: Settings,
+            meta: { title: 'Settings' },
           },
           {
             path: 'developer',
