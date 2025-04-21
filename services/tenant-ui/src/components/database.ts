@@ -79,13 +79,6 @@ function formatKind(kind: number): string {
   return kinds[kind] || `Type ${kind}`;
 }
 
-/**
- * Format date to be more readable
- */
-function formatDate(date: Date): string {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleString();
-}
 
 /**
  * Count items by category with credential type extraction

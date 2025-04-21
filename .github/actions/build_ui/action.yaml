@@ -6,20 +6,21 @@ inputs:
     required: false
     default: ""
   context:
+    description: "The build context directory"
     required: true
-    type: string
     default: "./services/tenant-ui"
   image_name:
+    description: "Name of the Docker image"
     required: true
-    type: string
   registry:
+    description: "Container registry to push to"
     required: true
-    type: string
     default: ghcr.io
   registry_username:
+    description: "Username for container registry"
     required: true
-    type: string
   registry_password:
+    description: "Password for container registry"
     required: true
 
 outputs:
@@ -101,6 +102,7 @@ runs:
           type=semver,pattern={{major}}.{{minor}}
           type=ref,event=pr
           type=sha
+          type=raw,value=latest
 
     - name: Build and push image
       id: builder

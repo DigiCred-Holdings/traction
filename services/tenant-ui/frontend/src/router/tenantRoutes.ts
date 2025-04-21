@@ -3,6 +3,8 @@ import Dashboard from '@/views/Dashboard.vue';
 import About from '@/views/About.vue';
 import Onboarding from '@/views/Onboarding.vue';
 import Transcript from '@/views/transcript/Transcript.vue';
+import Workflows from '@/views/Workflows.vue';
+
 // Tenant
 import TenantUi from '@/views/TenantUi.vue';
 import Profile from '@/views/tenant/Profile.vue';
@@ -57,7 +59,11 @@ const tenantRoutes: RouteRecordRaw[] = [
         component: Onboarding,
         meta: { title: 'Onboarding' },
       },
-
+      {
+        path: '/workflow-list',
+        name: 'Workflows',
+        component: Workflows,
+      },
       // About
       {
         path: '/transcript',
