@@ -71,7 +71,7 @@ export const useConnectionStore = defineStore('connection', () => {
         API_PATH.CONNECTIONS_CREATE_INVITATION,
         {},
         {
-          params: { alias, multi_use: multiUse },
+          params: { alias, multi_use: multiUse, auto_accept: true },
         }
       )
       .then((res) => {
