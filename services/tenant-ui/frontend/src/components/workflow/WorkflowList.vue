@@ -1,13 +1,6 @@
 <template>
-  <div
-    v-if="workflows.length === 0"
-    class="flex justify-content-center align-items-center h-full"
-  >
-    <p class="text-2xl font-bold">{{ $t('common.noRecordsFound') }}</p>
-  </div>
 
   <DataTable
-    v-else
     v-model:expanded-rows="expandedRows"
     v-model:filters="filter"
     :loading="loading"
@@ -28,7 +21,7 @@
         <Button
           :label="$t('workflow.add')"
           icon="pi pi-plus"
-          class="p-button"
+          class="btn-primary pi-button"
           icon-pos="right"
           @click="$emit('add', webHookUrl)"
         />
@@ -145,7 +138,7 @@ const fetchWorkflows = async () => {
     }
   } catch (error) {
     console.error('Error fetching workflows:', error);
-    workflows.value = [{}];
+    workflows.value = [];
   }
 };
 
@@ -170,7 +163,7 @@ const filter = ref({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   padding: 20px;
 }
@@ -207,7 +200,7 @@ td {
 }
 .btn-primary {
   padding: 8px 12px;
-  background: #3c5973;
+  background: $tenant-ui-new-accent-color;
   color: white;
   border: none;
   cursor: pointer;
