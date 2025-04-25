@@ -11,7 +11,7 @@
   </div>
   <div class="json-panel-container">
     <!-- Left Panel -->
-    <div class="json-panel" ref="leftPane">
+    <div ref="leftPane" class="json-panel">
       <div class="toolbar">
         <span class="title">{{ workflowName }}</span>
       </div>
@@ -20,15 +20,15 @@
         <JsonEditorVue
           v-bind="jsonEditorSettings"
           v-model="jsonData"
-          @update:modelValue="onEditorUpdate"
           :stringified="false"
           style="height: 65vh"
+          @update:model-value="onEditorUpdate"
         />
       </div>
     </div>
     <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
     <!-- Right Panel -->
-    <div class="render-panel" ref="topRightPane">
+    <div ref="topRightPane" class="render-panel">
       <div class="workflow-card">
         {{
           console.log(
@@ -40,7 +40,7 @@
         <div class="spacer" style="height: 1px"></div>
       </div>
       <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
-      <div class="bottom" ref="bottomRightPane">
+      <div ref="bottomRightPane" class="bottom">
         <Button
           label="Reset-UI"
           icon="pi pi-refresh"
@@ -65,6 +65,7 @@ import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
 import Button from 'primevue/button';
 import { Workflow, State } from '@/types/workflow';
 import { useToast } from 'vue-toastification';
+import { webhookService } from '@/services/webhookService';
 const emit = defineEmits(['back']);
 const toast = useToast();
 const { workflow, webhookUrl, update } = defineProps({
@@ -206,36 +207,21 @@ const save = async () => {
     return; // Stop if data is not valid JSON
   }
 
-  // Removed: Object.assign(jsonData,newData) - This was likely causing the error
   console.log('update:', update);
   console.log('Saving data:', JSON.stringify(dataToSave, null, 2)); // Log the data being sent
 
   try {
     if (webhookUrl) {
-      const endpoint = update
-        ? `${webhookUrl}/workflow/update-workflow`
-        : `${webhookUrl}/workflow/set-workflow`;
-      const method = update ? 'PUT' : 'POST'; // Use PUT for update, POST for create
+      console.log(
+        `Sending ${update ? 'update' : 'create'} request for workflow`
+      );
 
-      console.log(`Sending request to ${endpoint} with method ${method}`);
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSave), // Use the clean data copy
-      });
-      if (!response.ok) {
-        const errorBody = await response.text(); // Read error response body
-        console.error(
-          'Network response was not ok:',
-          response.status,
-          errorBody
-        );
-        throw new Error(
-          `Network response was not ok: ${response.status} ${errorBody}`
-        );
+      if (update) {
+        await webhookService.updateWorkflow(webhookUrl, dataToSave);
+      } else {
+        await webhookService.createWorkflow(webhookUrl, dataToSave);
       }
+
       const successMessage = update
         ? 'Workflow Updated Successfully'
         : 'Workflow Created Successfully';
