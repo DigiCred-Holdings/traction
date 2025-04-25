@@ -59,8 +59,6 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import { Workflow } from '@/types/workflow';
-import { useToast } from 'vue-toastification';
 import JsonEditorVue from 'json-editor-vue';
 import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
 import Button from 'primevue/button';

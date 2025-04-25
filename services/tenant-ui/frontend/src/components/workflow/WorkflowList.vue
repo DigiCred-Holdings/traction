@@ -105,7 +105,6 @@ import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
-import { TABLE_OPT } from '@/helpers/constants';
 import { webhookService } from '@/services/webhookService';
 
 const workflows = ref([]);
