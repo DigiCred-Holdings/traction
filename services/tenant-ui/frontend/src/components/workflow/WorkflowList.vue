@@ -24,14 +24,13 @@
   >
     <template #header>
       <div class="flex flex-wrap justify-content-between">
-        <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
-        <span class="text-xl font-bold">Workflow List</span>
+        <span class="text-xl font-bold">{{ $t('workflow.list') }}</span>
         <Button
           :label="$t('workflow.add')"
           icon="pi pi-plus"
-          @click="$emit('add', webHookUrl)"
           class="p-button"
           icon-pos="right"
+          @click="$emit('add', webHookUrl)"
         />
       </div>
     </template>
@@ -96,11 +95,12 @@
   </DataTable>
 </template>
 <script setup>
-import { ref, onMounted, defineEmits, defineProps } from 'vue';
+import { ref, onMounted, defineEmits } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'vue-toastification';
 import { useTenantStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { TABLE_OPT } from '@/helpers/constants';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -108,13 +108,8 @@ import InputText from 'primevue/inputtext';
 import { TABLE_OPT } from '@/helpers/constants';
 import { webhookService } from '@/services/webhookService';
 
-// eslint-disable-next-line vue/no-dupe-keys
 const workflows = ref([]);
 const toast = useToast();
-
-defineProps({
-  workflows: Array,
-});
 
 defineEmits(['edit', 'add']);
 

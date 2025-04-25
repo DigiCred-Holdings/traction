@@ -6,8 +6,7 @@
       class="pi-button"
       @click="$emit('back')"
     />
-    <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
-    <h2>{{ update ? 'Edit Workflow' : 'Create New Workflow' }}</h2>
+    <h2>{{ update ? $t('workflow.edit') : $t('workflow.create') }}</h2>
   </div>
   <div class="json-panel-container">
     <!-- Left Panel -->
@@ -22,7 +21,7 @@
           v-model="jsonData"
           :stringified="false"
           style="height: 65vh"
-          @update:model-value="onEditorUpdate"
+          @update:modelValue="onEditorUpdate"
         />
       </div>
     </div>
@@ -60,12 +59,15 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { Workflow } from '@/types/workflow';
+import { useToast } from 'vue-toastification';
 import JsonEditorVue from 'json-editor-vue';
 import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
 import Button from 'primevue/button';
 import { Workflow, State } from '@/types/workflow';
 import { useToast } from 'vue-toastification';
 import { webhookService } from '@/services/webhookService';
+
 const emit = defineEmits(['back']);
 const toast = useToast();
 const { workflow, webhookUrl, update } = defineProps({
@@ -75,6 +77,7 @@ const { workflow, webhookUrl, update } = defineProps({
   },
   webhookUrl: {
     type: String,
+    default: null,
   },
   update: {
     type: Boolean,
