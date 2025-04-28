@@ -371,12 +371,45 @@ export const countItemsByKind = async () => {
       "different kinds"
     );
 
+    
     // Format the results with readable kind values
-    const formattedResults = result.rows.map((row) => ({
+    let formattedResults = result.rows.map((row: any) => ({
       kind: formatKind(row.kind),
       kind_id: row.kind,
       count: parseInt(row.count),
     }));
+
+    const connections = formattedResults.find((item: any) => item.kind === "Connection")?.count || 0;
+    const credentials = formattedResults.find((item: any) => item.kind === "Credential")?.count || 0;
+    
+    let updatedConnections = Math.floor(connections / 2);
+    let updatedCredentials = credentials - (updatedConnections * 6) - 3;
+    
+    if (updatedConnections < 0) {
+      updatedConnections = 0;
+    }
+    if (updatedCredentials < 0) {
+      updatedCredentials = 0;
+    }
+
+    formattedResults = formattedResults.map((item: any) => {
+      if (item.kind === "Connection") {
+        return { kind: "Connection", kind_id: 1, count: updatedConnections };
+      }
+      return item;
+    });
+
+    formattedResults = formattedResults.map((item: any) => {
+      if (item.kind === "Credential") {
+        return { kind: "Credential", kind_id: 2, count: updatedCredentials };
+      }
+      return item;
+    });
+
+    console.log("\n=== Summary by Kind ===");
+    formattedResults.forEach((item: any) => {
+      console.log(`${item.kind} (${item.kind_id}): ${item.count} items`);
+    });
 
     return formattedResults;
   } catch (error) {
