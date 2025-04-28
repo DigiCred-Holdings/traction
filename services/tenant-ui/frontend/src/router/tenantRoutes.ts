@@ -48,7 +48,7 @@ const tenantRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/Dashboard.vue'),
+        component: () => Dashboard,
         meta: { title: 'Dashboard' },
       },
 
@@ -64,11 +64,12 @@ const tenantRoutes: RouteRecordRaw[] = [
         name: 'Workflows',
         component: Workflows,
       },
-      // About
+      // Transcript
       {
         path: '/transcript',
         name: 'transcript',
         component: Transcript,
+        meta: { title: 'Transcript' },
       },
 
       // About

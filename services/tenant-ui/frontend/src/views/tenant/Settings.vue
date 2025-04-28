@@ -7,39 +7,45 @@
       <div class="grid align-items-start">
         <div class="col-12 md:col-6 p-4">
           <div class="title pb-2">{{ t('settings.tenantProfile') }}</div>
-          <div class="description mb-4">
+          <div class="description mb-6">
             {{ t('settings.profileInformation') }}
           </div>
           <div class="settings-form">
             <!-- Tenant ID -->
             <div class="field">
-              <InputText
-                id="tenantId"
-                class="w-full"
-                :placeholder="$t('profile.tenantId')"
-                readonly
-                :value="tenant.tenant_id"
-              />
+              <FloatLabel>
+                <InputText
+                  id="tenantId"
+                  class="w-full"
+                  readonly
+                  :model-value="tenant.tenant_id"
+                />
+                <label for="tenantId">{{ $t('profile.tenantId') }}</label>
+              </FloatLabel>
             </div>
             <!-- Wallet ID -->
             <div class="field">
-              <InputText
-                id="walletId"
-                class="w-full"
-                :placeholder="$t('common.walletId')"
-                readonly
-                :value="tenant.wallet_id"
-              />
+              <FloatLabel>
+                <InputText
+                  id="walletId"
+                  class="w-full"
+                  readonly
+                  :model-value="tenant.wallet_id"
+                />
+                <label for="walletId">{{ $t('common.walletId') }}</label>
+              </FloatLabel>
             </div>
             <!-- Wallet Label -->
             <div class="field">
-              <InputText
-                id="walletLabel"
-                v-model="v$.walletLabel.$model"
-                :placeholder="$t('profile.walletLabel')"
-                class="w-full"
-                :class="{ 'p-invalid': v$.walletLabel.$invalid && submitted }"
-              />
+              <FloatLabel>
+                <InputText
+                  id="walletLabel"
+                  v-model="v$.walletLabel.$model"
+                  class="w-full"
+                  :class="{ 'p-invalid': v$.walletLabel.$invalid && submitted }"
+                />
+                <label for="walletLabel">{{ $t('profile.walletLabel') }}</label>
+              </FloatLabel>
               <span v-if="v$.walletLabel.$error && submitted">
                 <span
                   v-for="(error, index) of v$.walletLabel.$errors"
@@ -51,23 +57,29 @@
             </div>
             <!-- Name -->
             <div class="field">
-              <InputText
-                id="nameField"
-                class="w-full"
-                :placeholder="$t('profile.name')"
-                readonly
-                :value="tenant.tenant_name"
-              />
+              <FloatLabel>
+                <InputText
+                  id="nameField"
+                  class="w-full"
+                  readonly
+                  :model-value="tenant.tenant_name"
+                />
+                <label for="nameField">{{ $t('profile.name') }}</label>
+              </FloatLabel>
             </div>
             <!-- Email -->
             <div class="field">
-              <InputText
-                id="contactfield"
-                v-model="v$.contact_email.$model"
-                :placeholder="$t('profile.contact')"
-                class="w-full"
-                :class="{ 'p-invalid': v$.contact_email.$invalid && submitted }"
-              />
+              <FloatLabel>
+                <InputText
+                  id="contactfield"
+                  v-model="v$.contact_email.$model"
+                  class="w-full"
+                  :class="{
+                    'p-invalid': v$.contact_email.$invalid && submitted,
+                  }"
+                />
+                <label for="contactfield">{{ $t('profile.contact') }}</label>
+              </FloatLabel>
               <span v-if="v$.contact_email.$error && submitted">
                 <span
                   v-for="(error, index) of v$.contact_email.$errors"
@@ -82,17 +94,19 @@
 
         <div class="col-12 md:col-6 p-4">
           <div class="title pb-2">{{ t('settings.walletInformation') }}</div>
-          <div class="description mb-4">{{ t('settings.walletDetails') }}</div>
+          <div class="description mb-6">{{ t('settings.walletDetails') }}</div>
           <div class="settings-form">
             <!-- Image URL -->
             <div class="field">
-              <InputText
-                id="imageUrl"
-                v-model="v$.imageUrl.$model"
-                class="w-full"
-                :placeholder="$t('settings.logoUrl')"
-                :class="{ 'p-invalid': v$.imageUrl.$invalid && submitted }"
-              />
+              <FloatLabel>
+                <InputText
+                  id="imageUrl"
+                  v-model="v$.imageUrl.$model"
+                  class="w-full"
+                  :class="{ 'p-invalid': v$.imageUrl.$invalid && submitted }"
+                />
+                <label for="imageUrl">{{ $t('settings.logoUrl') }}</label>
+              </FloatLabel>
               <span v-if="v$.imageUrl.$error && submitted">
                 <span
                   v-for="(error, index) of v$.imageUrl.$errors"
@@ -111,24 +125,46 @@
                 class="grid align-items-start"
               >
                 <div class="col-12 md:col-5">
-                  <div class="field">
+                  <div class="field md:mb-0 mb-4">
+                    <FloatLabel v-if="index === 0">
+                      <InputText
+                        id="webhookUrl"
+                        v-model="webhook.webhookUrl"
+                        class="w-full"
+                      />
+                      <label for="webhookUrl">{{
+                        $t('profile.webHookUrl')
+                      }}</label>
+                    </FloatLabel>
                     <InputText
-                      id="webhookUrl"
+                      v-else
                       v-model="webhook.webhookUrl"
-                      :placeholder="$t('profile.webHookUrl')"
                       class="w-full"
+                      :placeholder="$t('profile.webHookUrl')"
                     />
                   </div>
                 </div>
                 <div class="col-12 md:col-7">
-                  <div class="field flex">
+                  <div class="field flex md:mb-0">
+                    <FloatLabel v-if="index === 0" class="flex-grow-1 flex">
+                      <Password
+                        id="webhookKey"
+                        v-model="webhook.webhookKey"
+                        class="flex-grow-1"
+                        toggle-mask
+                        :feedback="false"
+                      />
+                      <label for="webhookKey">{{
+                        $t('profile.webHookKey')
+                      }}</label>
+                    </FloatLabel>
                     <Password
-                      id="webhookKey"
+                      v-else
                       v-model="webhook.webhookKey"
-                      :placeholder="$t('profile.webHookKey')"
                       toggle-mask
                       :feedback="false"
                       class="flex-grow-1"
+                      :placeholder="$t('profile.webHookKey')"
                     />
 
                     <Button
@@ -179,6 +215,7 @@ import Button from 'primevue/button';
 import Password from 'primevue/password';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'vue-toastification';
+import FloatLabel from 'primevue/floatlabel';
 
 interface Webhook {
   webhookUrl: string;
@@ -464,6 +501,10 @@ const handleSubmit = async (isFormValid: boolean) => {
   padding: 20px;
   position: relative;
 
+  .p-float-label input:focus ~ label {
+    left: 0;
+  }
+
   .loading-overlay {
     position: absolute;
     top: 0;
@@ -497,8 +538,11 @@ const handleSubmit = async (isFormValid: boolean) => {
     width: 100%;
   }
 
-  .field :deep(.p-inputtext:focus) {
-    box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2) !important;
+  .field {
+    margin-bottom: 2.5rem;
+    &:deep(.p-inputtext:focus) {
+      box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2) !important;
+    }
   }
 
   button.btn-webhook {
