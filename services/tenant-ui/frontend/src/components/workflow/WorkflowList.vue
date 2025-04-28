@@ -105,6 +105,7 @@ import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
+import { webhookService } from '@/services/webhookService';
 
 const workflows = ref([]);
 const toast = useToast();
@@ -119,6 +120,7 @@ const loadTenantSettings = async () => {
   try {
     await tenantStore.getTenantSubWallet();
     const webhookUrls = tenantWallet.value?.settings?.['wallet.webhook_urls'];
+    console.log('webhookUrls', webhookUrls);
     if (webhookUrls && webhookUrls.length > 0) {
       webHookUrl.value = webhookUrls[0];
     } else {
@@ -134,14 +136,8 @@ const loadTenantSettings = async () => {
 const fetchWorkflows = async () => {
   try {
     if (webHookUrl.value) {
-      const response = await fetch(
-        `${webHookUrl.value}/workflow/get-workflows`
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      workflows.value = await response.json();
-      console.log(response);
+      workflows.value = await webhookService.getWorkflows(webHookUrl.value);
+      console.log(workflows.value);
     }
   } catch (error) {
     console.error('Error fetching workflows:', error);
