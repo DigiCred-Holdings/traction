@@ -17,7 +17,7 @@ async function processQueue() {
   console.log(`Message Queue Processor: Watching queue "${redisService.QUEUES.MESSAGES}"`);
   
   try {
-    let isRunning = true;
+    const isRunning = true;
     let messageProcessed = false;
     let processedCount = 0;
     let errorCount = 0;
