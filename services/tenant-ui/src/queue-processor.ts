@@ -17,11 +17,12 @@ async function processQueue() {
   console.log(`Message Queue Processor: Watching queue "${redisService.QUEUES.MESSAGES}"`);
   
   try {
+    let isRunning = true;
     let messageProcessed = false;
     let processedCount = 0;
     let errorCount = 0;
     
-    while (true) {
+    while (isRunning) {
       try {
         messageProcessed = await messageService.processMessageFromQueue();
         
