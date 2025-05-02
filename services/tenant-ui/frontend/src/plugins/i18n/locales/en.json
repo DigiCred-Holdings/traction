@@ -115,7 +115,6 @@
     "alias": "Alias",
     "apiKey": "API Key",
     "byName": "Search By Name",
-    "close": "Close",
     "configDelim": ": ",
     "confirmation": "Confirmation",
     "connectionName": "Connection Name",
@@ -391,18 +390,7 @@
     "disclaimer": "Note: This table contains the message storage records. For per-connection conversations, see the 'Connections' page.",
     "messageContent": "Message Content",
     "messages": "Messages",
-    "messageDetails": "Message Details",
-    "broadcastMessage": "Broadcast Message",
-    "typePlaceholder": "Type your message here...",
-    "sendToAllConnections": "Send to All Connections",
-    "sendingToConnections": "Sending Message to Connections",
-    "sending": "Sending...",
-    "messageSent": "Message Sent",
-    "failedToSend": "Failed to Send",
-    "startBroadcast": "Start Broadcast",
-    "enterMessage": "Please enter a message to send",
-    "broadcastComplete": "Broadcast completed",
-    "readyToSend": "Ready to send"
+    "messageDetails": "Message Details"
   },
   "profile": {
     "config": "Config:",

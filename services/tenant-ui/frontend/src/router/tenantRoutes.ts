@@ -38,8 +38,6 @@ import OnboardingTablet from '@/views/OnboardingTablet.vue';
 import { RouteRecordRaw } from 'vue-router';
 // import i18n from '@/plugins/i18n/i18n';
 
-import MyMessages_new from '@/views/messagesNew/MyMessages_new.vue';
-
 const tenantRoutes: RouteRecordRaw[] = [
   // Tenant Routes (base / is Tenant side for this app)
   {
@@ -191,13 +189,6 @@ const tenantRoutes: RouteRecordRaw[] = [
             component: MyMessages,
           },
         ],
-      },
-
-      // Tenant - New Messages
-      {
-        path: 'messages-new',
-        name: 'MyMessages-new',
-        component: MyMessages_new,
       },
 
       // Tenant - API Keys
