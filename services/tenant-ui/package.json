@@ -9,12 +9,14 @@
     "start": "node dist/src/index.js",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
     "lint": "eslint . --ext .ts --max-warnings=2 --ignore-path .gitignore --ignore-pattern 'frontend/*' .",
-    "test": "jest"
+    "test": "jest",
+    "queue-processor": "ts-node src/queue-processor.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-cron": "^3.0.11",
     "axios": "^1.7.7",
     "config": "^3.3.12",
     "connect-history-api-fallback": "^2.0.0",
@@ -25,8 +27,10 @@
     "express-validator": "^7.2.0",
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "pg": "^8.14.1",
+    "redis": "^5.0.0",
     "tenant-ui": "file:",
     "ws": "^8.18.0"
   },

@@ -110,6 +110,8 @@ services:
     depends_on:
       tenant-proxy:
         condition: service_started
+      redis:
+        condition: service_healthy
     environment:
       - SERVER_TRACTION_URL=${SERVER_TRACTION_URL}
       - SERVER_LOKI_URL=${SERVER_LOKI_URL}
@@ -128,6 +130,15 @@ services:
       - FRONTEND_QUICK_CONNECT_ENDORSER_NAME=${FRONTEND_QUICK_CONNECT_ENDORSER_NAME}
       - SERVER_SMTP_SERVER=maildev
       - SERVER_SMTP_PORT=1025
+      - POSTGRESQL_HOST=traction-db
+      - POSTGRESQL_PORT=${POSTGRESQL_PORT}
+      - POSTGRESQL_DB=askar-wallet
+      - POSTGRESQL_USER=${POSTGRESQL_USER}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - WEBHOOK_API_KEY=${WEBHOOK_API_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_TTL=${REDIS_TTL:-3600}
     ports:
       - ${TENANT_UI_PORT}:8080
     ###############################################
@@ -137,6 +148,52 @@ services:
       - ../services/tenant-ui/config/forms:/usr/src/app/frontend/dist/forms # Mount specific forms directory
     ###############################################
     #command: ["tail", "-f", "/dev/null"] # Keeps container alive without running the main app
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  tenant-queue-processor:
+    pull_policy: missing
+    build:
+      context: ../services/tenant-ui
+      dockerfile: Dockerfile
+    image: traction:tenant-ui
+    depends_on:
+      tenant-ui:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - SERVER_TRACTION_URL=${SERVER_TRACTION_URL}
+      - SERVER_LOKI_URL=${SERVER_LOKI_URL}
+      - FRONTEND_TENANT_PROXY_URL=${FRONTEND_TENANT_PROXY_URL}
+      - WALLET_ID_ONBOARDING_TABLET_CAPEFEAR=${WALLET_ID_ONBOARDING_TABLET_CAPEFEAR}
+      - WALLET_KEY_ONBOARDING_TABLET_CAPEFEAR=${WALLET_KEY_ONBOARDING_TABLET_CAPEFEAR}
+      - FRONTEND_LOG_STREAM_URL=${FRONTEND_LOG_STREAM_URL}
+      - IMAGE_BUILDTIME=${IMAGE_BUILDTIME}
+      - IMAGE_TAG=${IMAGE_TAG}
+      - IMAGE_VERSION=${IMAGE_VERSION}
+      - UX_APP_TITLE=${UX_APP_TITLE}
+      - UX_APP_INNKEEPER_TITLE=${UX_APP_INNKEEPER_TITLE}
+      - UX_SIDEBAR_TITLE=${UX_SIDEBAR_TITLE}
+      - UX_COPYRIGHT=${UX_COPYRIGHT}
+      - UX_OWNER=${UX_OWNER}
+      - FRONTEND_QUICK_CONNECT_ENDORSER_NAME=${FRONTEND_QUICK_CONNECT_ENDORSER_NAME}
+      - SERVER_SMTP_SERVER=maildev
+      - SERVER_SMTP_PORT=1025
+      - POSTGRESQL_HOST=traction-db
+      - POSTGRESQL_PORT=${POSTGRESQL_PORT}
+      - POSTGRESQL_DB=askar-wallet
+      - POSTGRESQL_USER=${POSTGRESQL_USER}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - WEBHOOK_API_KEY=${WEBHOOK_API_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_TTL=${REDIS_TTL:-3600}
+    command: ["node", "dist/src/queue-processor.js"]
+    volumes:
+      # - ../services/tenant-ui:/usr/src/app # Mount the entire application
+      - ../services/tenant-ui/config/forms:/usr/src/app/frontend/dist/forms # Mount specific forms directory
     extra_hosts:
       - host.docker.internal:host-gateway
 
@@ -191,10 +248,13 @@ services:
       ]
     environment:
       - RUST_LOG=error
+      - ACAPY_ENDPOINT=${ACAPY_ENDPOINT}
     volumes:
       - "./endorser-acapy-args.yml:/home/aries/endorser-acapy-args.yml"
+      - ./ledgers.yml:/home/aries/ledgers.yml
     extra_hosts:
       - host.docker.internal:host-gateway
+    networks: [default]
 
   endorser-agent-1:
     image: ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2
@@ -231,8 +291,10 @@ services:
       - RUST_LOG=error
     volumes:
       - "./endorser-acapy-args.yml:/home/aries/endorser-acapy-args.yml"
+      - ./ledgers.yml:/home/aries/ledgers.yml
     extra_hosts:
       - host.docker.internal:host-gateway
+    networks: [default]
 
   endorser-db:
     image: "postgres:15"
@@ -258,7 +320,23 @@ services:
       - "1080:1080"
       - "1025:1025"
 
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
 volumes:
   traction-wallet:
   endorser-wallet:
   endorser-wallet-1:
+  redis-data:
