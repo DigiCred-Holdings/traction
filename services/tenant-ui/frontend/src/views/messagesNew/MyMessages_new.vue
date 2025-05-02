@@ -56,13 +56,17 @@ const startBroadcast = async () => {
   try {
     broadcastStarted.value = true;
     
-    const response = await axios.post('/api/messages/broadcast', {
-      message: message.value
-    }, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
+    const response = await axios.post(
+      '/api/messages/broadcast',
+      {
+        message: message.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
       }
-    });
+    );
 
     console.log(response);
     toast.success(t('messages.broadcastSuccess'));
@@ -101,8 +105,8 @@ const startBroadcast = async () => {
         :label="$t('messages.sendToAllConnections')"
         icon="pi pi-send"
         class="p-button-primary"
-        @click="startBroadcast"
         :disabled="broadcastStarted"
+        @click="startBroadcast"
       />
     </div>
 
@@ -171,15 +175,15 @@ const startBroadcast = async () => {
           :label="$t('messages.startBroadcast')"
           icon="pi pi-send"
           class="p-button-primary"
-          @click="startBroadcast"
           :disabled="broadcastStarted"
+          @click="startBroadcast"
         />
         <Button
           :label="$t('common.close')"
           icon="pi pi-times"
           class="p-button-secondary ml-2"
-          @click="showDialog = false"
           :disabled="broadcastStarted"
+          @click="showDialog = false"
         />
       </template>
     </Dialog>

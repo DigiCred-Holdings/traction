@@ -13,6 +13,9 @@ RUN npm cache clean --force && npm ci --verbose
 # Install frontend libraries
 RUN cd frontend && npm cache clean --force && npm ci
 
+# Run lint check for frontend
+RUN cd frontend && npm run lint || (echo "Lint check failed" && exit 1)
+
 # Build backend
 RUN npm run build
 
