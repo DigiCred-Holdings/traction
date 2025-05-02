@@ -135,7 +135,10 @@ router.get(
     try {
       console.log("Router: Getting item type summary with ACA-Py connections");
       
-      const summary = await databaseComponent.countItemsByKind();
+      const forceRefresh = req.query.forceRefresh === 'true';
+      console.log(`Router: forceRefresh parameter is ${forceRefresh}`);
+      
+      const summary = await databaseComponent.countItemsByKind(forceRefresh);
       console.log("Router: Summary generated successfully");
       res.status(200).json(summary);
     } catch (error: any) {

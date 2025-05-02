@@ -23,7 +23,7 @@ const sendingStatus = ref<Record<string, 'pending' | 'sent' | 'error' | null>>(
   {}
 );
 const broadcastStarted = ref(false);
-import { useTokenStore } from "@/store";
+import { useTokenStore } from '@/store';
 
 onMounted(async () => {
   await loadTenantSettings();
@@ -38,7 +38,6 @@ const loadTenantSettings = async () => {
     toast.error(t('common.loadError'));
   }
 };
-
 
 const openSendDialog = () => {
   if (!message.value.trim()) {

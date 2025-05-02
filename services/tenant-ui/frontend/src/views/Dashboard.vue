@@ -1,16 +1,10 @@
 <template>
-  <div class="row flex flex-wrap main-dashboard lg:m-0">
+  <div class="row flex flex-wrap main-dashboard lg:m-0 relative">
     <div class="col-12 lg:col-6 left-container lg:p-0">
       <Card
         title="Student IDs Issued"
         :value="
           String(summary.find((item) => item.kind === 'Credential')?.count || 0)
-        "
-      />
-      <Card
-        title="Transcripts Issued"
-        :value="
-          String(summary.find((item) => item.kind === 'Transcript')?.count || 0)
         "
       />
       <Card
@@ -43,6 +37,14 @@
         :failed="0"
       />
     </div>
+    <button
+      class="p-button p-button-sm p-button-rounded p-button-text absolute bottom-0 right-0 mb-3 mr-3"
+      style="z-index: 10"
+      @click="fetchSummaryData(true)"
+      v-tooltip.left="'Refresh Data'"
+    >
+      <i class="pi pi-refresh"></i></button
+    >
   </div>
 </template>
 <script setup lang="ts">
@@ -53,6 +55,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useTenantStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { useTokenStore } from '@/store';
+import Tooltip from 'primevue/tooltip';
 
 interface SummaryItem {
   kind:
@@ -90,8 +93,14 @@ const loadTenantSettings = async () => {
   }
 };
 
-const fetchSummaryData = async () => {
+const fetchSummaryData = async (forceRefresh: boolean = false) => {
   try {
+    let apiUrl = '/api/items/summary';
+    if (forceRefresh) {
+      apiUrl += '?forceRefresh=true';
+      console.log('Dashboard: Forcing cache refresh');
+    }
+
     const config = {
       headers: {
         Authorization: `Bearer ${token.value}`,
@@ -103,8 +112,7 @@ const fetchSummaryData = async () => {
     );
 
     const response = await axios.get<SummaryItem[]>(
-      '/api/items/summary',
-      config
+      apiUrl, config
     );
     summary.value = response.data;
     console.log('Dashboard: Summary data received:', summary.value);

@@ -27,8 +27,9 @@ export enum ItemKind {
   Failed = "Failed"
 }
 
-export const countItemsByKind = async () => {
+export const countItemsByKind = async (forceRefresh: boolean = false) => {
   console.log("Database: Counting items by kind (type) using ACA-Py API for connections and credentials only");
+  console.log(`Force refresh requested: ${forceRefresh}`);
 
   try {
     type SummaryItem = {
@@ -38,10 +39,14 @@ export const countItemsByKind = async () => {
       source: string;
     };
 
-    const cachedResults = await redisService.redisClient.get('summary:items_by_kind');
-    if (cachedResults) {
-      console.log("Using cached results from Redis");
-      return JSON.parse(cachedResults);
+    if (!forceRefresh) {
+      const cachedResults = await redisService.redisClient.get('summary:items_by_kind');
+      if (cachedResults) {
+        console.log("Using cached results from Redis");
+        return JSON.parse(cachedResults);
+      }
+    } else {
+      console.log("Cache bypassed due to force refresh request.");
     }
 
     const formattedResults: SummaryItem[] = [];
