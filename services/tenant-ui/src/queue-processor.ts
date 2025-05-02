@@ -1,6 +1,5 @@
 import messageService from './services/message-service';
 import redisService from './services/redis-service';
-import acaPyService from './services/acapy-service';
 import dotenv from 'dotenv';
 
 dotenv.config();
