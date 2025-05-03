@@ -56,11 +56,12 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import { Workflow } from '@/types/workflow';
-import { useToast } from 'vue-toastification';
 import JsonEditorVue from 'json-editor-vue';
 import WorkflowCard from '@/components/workflow/WorkflowRender.vue';
 import Button from 'primevue/button';
+import { Workflow, State } from '@/types/workflow';
+import { useToast } from 'vue-toastification';
+import { webhookService } from '@/services/webhookService';
 
 const emit = defineEmits(['back']);
 const toast = useToast();
@@ -210,31 +211,17 @@ const save = async () => {
 
   try {
     if (webhookUrl) {
-      const endpoint = update
-        ? `${webhookUrl}/workflow/update-workflow`
-        : `${webhookUrl}/workflow/set-workflow`;
-      const method = update ? 'PUT' : 'POST'; // Use PUT for update, POST for create
 
-      console.log(`Sending request to ${endpoint} with method ${method}`);
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSave), // Use the clean data copy
-      });
-      console.log('Response status:', response);
-      if (!response.ok) {
-        const errorBody = await response.text(); // Read error response body
-        console.error(
-          'Response was not ok:',
-          response.status,
-          errorBody
-        );
-        throw new Error(
-          `Response was not ok: ${response.status} ${errorBody}`
-        );
+      console.log(
+        `Sending ${update ? 'update' : 'create'} request for workflow`
+      );
+
+      if (update) {
+        await webhookService.updateWorkflow(webhookUrl, dataToSave);
+      } else {
+        await webhookService.createWorkflow(webhookUrl, dataToSave);
       }
+
       const successMessage = update
         ? 'Workflow Updated Successfully'
         : 'Workflow Created Successfully';
