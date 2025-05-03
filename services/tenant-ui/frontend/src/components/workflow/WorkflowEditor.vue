@@ -28,7 +28,6 @@
     <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
     <!-- Right Panel -->
     <div ref="topRightPane" class="render-panel">
-      <div class="workflow-card">
         {{
           console.log(
             `WorkflowEditor: ${jsonData.name}:`,
@@ -36,8 +35,6 @@
           )
         }}
         <WorkflowCard :data="workflowData" />
-        <div class="spacer" style="height: 1px"></div>
-      </div>
       <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
       <div ref="bottomRightPane" class="bottom">
         <Button
@@ -123,6 +120,7 @@ watch(
   { deep: true }
 );
 
+// Resizalble panes (commented out for now)
 // const leftPane = ref<HTMLElement|null>(null)
 // const topRightPane = ref<HTMLElement|null>(null)
 // const bottomRightPane = ref<HTMLElement|null>(null)
@@ -213,6 +211,7 @@ const save = async () => {
 
   try {
     if (webhookUrl) {
+
       console.log(
         `Sending ${update ? 'update' : 'create'} request for workflow`
       );
@@ -231,6 +230,7 @@ const save = async () => {
         update ? 'Workflow Data Updated:' : 'Workflow Data Saved:',
         dataToSave
       );
+      emit('back');
     } else {
       console.error('Webhook URL is missing, cannot save.');
       toast.error('Cannot save workflow: Webhook URL is missing.');
@@ -249,7 +249,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .header {
   display: flex;
   align-items: center;
@@ -269,7 +269,7 @@ watch(
 
 .json-panel {
   overflow: auto;
-  background: #6666cc;
+  background: $tenant-ui-new-accent-color;
   border-radius: 3px 0 0 3px;
   color: white;
   box-sizing: border-box;
@@ -302,15 +302,16 @@ watch(
   flex-direction: column;
   background: #f4f4f9;
   height: 70%;
+  align-items: center;
 }
 
 .workflow-card {
-  padding: 10px;
-  overflow: auto;
+  padding: 0 10px;
   background: #f4f4f9;
   border-radius: 0 4px 0 0;
   display: flex;
   width: 100%;
+  overflow: auto;
   justify-content: center;
 }
 
@@ -319,13 +320,18 @@ watch(
   overflow: auto;
   background: #f4f4f9;
   border-radius: 0 0 4px;
-  gap: 10px;
-  padding: 20px;
+  gap: 20px;
+  padding: 10px;
   justify-content: space-evenly;
+  width: 90%;
 }
 .bottom button {
-  flex: 1;
+  color: white;
+  border: none;
   margin: 0 5px;
+}
+button{
+  background-color: $tenant-ui-new-accent-color;
 }
 .title {
   font-size: 18px;
