@@ -129,11 +129,3 @@ const handleClose = async () => {
   displayModal.value = false;
 };
 </script>
-
-<style>
-.taa-html {
-  background-color: #eaeaea;
-  border: 1px dashed gray;
-  padding: 1em;
-}
-</style>

@@ -13,12 +13,12 @@
           String(summary.find((item) => item.kind === 'Transcript')?.count || 0)
         "
       />
-      <Card
+      <!-- <Card
         title="Messages"
         :value="
           String(summary.find((item) => item.kind === 'Message')?.count || 0)
         "
-      />
+      /> -->
       <Card
         title="Onboarded"
         :value="
@@ -26,8 +26,8 @@
         "
       />
       <!-- TODO: We need to get the invited and failed counts from the API -->
-      <Card title="Invited" value="0" />
-      <Card title="Failed" value="0" />
+      <!-- <Card title="Invited" value="0" />
+      <Card title="Failed" value="0" /> -->
     </div>
     <div class="col-12 lg:col-6 right-container lg:py-0">
       <Chart

@@ -21,7 +21,7 @@
     "pleaseEnterTheStudent": "Please enter the student ID to generate a QR code that is used to onboard a student.",
     "reset": "Reset"
   },
-  "workflow":{
+  "workflow": {
     "workflow": "Workflow",
     "add": "Add Workflow",
     "list": "Workflow List",
@@ -58,7 +58,11 @@
     "fetching": "Fetching...",
     "notFound": "Student not found",
     "noMetaData": "This connection doesn't have metadata! Enter the student ID to send the transcript.",
-    "noTranscript": "There is no transcript with this student ID!"
+    "noTranscript": "There is no transcript with this student ID!",
+    "sendATranscript": "Send a Transcript",
+    "sendTranscript": "Send Transcript",
+    "viewTranscript": "View Transcript",
+    "enterTheStudentID": "Enter the student's ID to generate and send their digital transcript. This will securely deliver their academic records within the system."
   },
   "about": {
     "about": "About",
@@ -643,5 +647,12 @@
   },
   "log": {
     "log": "Log"
+  },
+  "settings": {
+    "tenantProfile": "Tenant Profile",
+    "profileInformation": "Profile information",
+    "walletInformation": "Wallet Information",
+    "walletDetails": "Wallet details",
+    "logoUrl": "Logo URL"
   }
 }
