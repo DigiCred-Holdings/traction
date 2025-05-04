@@ -35,27 +35,59 @@ export const queueBroadcastMessage = async (message: string, token: string = '')
   }
 };
 
+export const queueSummaryUpdate = async (token: string = ''): Promise<void> => {
+  try {
+    console.log('Message Service: Queuing summary update request');
+    await redisService.addToQueue(redisService.QUEUES.SUMMARY, {
+      token,
+      timestamp: new Date().toISOString(),
+    });
+    console.log('Successfully queued summary update request');
+  } catch (error) {
+    console.error('Error queuing summary update request:', error);
+    throw error;
+  }
+};
+
 export const processMessageFromQueue = async (): Promise<boolean> => {
   try {
-    const item = await redisService.getFromQueue(redisService.QUEUES.MESSAGES, 5);
+    const messageItem = await redisService.getFromQueue(redisService.QUEUES.MESSAGES, 0);
     
-    if (!item) {
-      return false;
+    if (messageItem) {
+      console.log(`Processing message to connection ${messageItem.connectionId}`);
+      
+      if (messageItem.token) {
+        console.log('Setting token from queue message');
+        acaPyService.setToken(messageItem.token);
+      }
+      
+      await acaPyService.sendBasicMessage(messageItem.connectionId, messageItem.message);
+      
+      console.log(`Successfully sent message to connection ${messageItem.connectionId}`);
+      return true;
     }
     
-    console.log(`Processing message to connection ${item.connectionId}`);
+    const summaryItem = await redisService.getFromQueue(redisService.QUEUES.SUMMARY, 0);
     
-    if (item.token) {
-      console.log('Setting token from queue message');
-      acaPyService.setToken(item.token);
+    if (summaryItem) {
+      console.log('Processing summary update request');
+      
+      if (summaryItem.token) {
+        console.log('Setting token from summary update request');
+        acaPyService.setToken(summaryItem.token);
+      }
+      
+      console.log('Updating summary with forceRefresh=true');
+      await databaseComponent.countItemsByKind(true);
+      
+      console.log('Successfully processed summary update');
+      return true;
     }
     
-    await acaPyService.sendBasicMessage(item.connectionId, item.message);
-    
-    console.log(`Successfully sent message to connection ${item.connectionId}`);
-    return true;
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return false;
   } catch (error) {
-    console.error('Error processing message from queue:', error);
+    console.error('Error processing from queue:', error);
     return true;
   }
 };
@@ -79,5 +111,6 @@ export const sendMessageToConnection = async (connectionId: string, message: str
 export default {
   queueBroadcastMessage,
   processMessageFromQueue,
-  sendMessageToConnection
+  sendMessageToConnection,
+  queueSummaryUpdate
 };

@@ -36,7 +36,7 @@ async function processQueue() {
             console.log(`Message Queue Processor: Queue empty after processing ${processedCount} messages`);
             processedCount = 0;
           }
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
         
         errorCount = 0;

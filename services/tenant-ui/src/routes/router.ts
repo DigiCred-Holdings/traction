@@ -138,11 +138,34 @@ router.get(
       const forceRefresh = req.query.forceRefresh === 'true';
       console.log(`Router: forceRefresh parameter is ${forceRefresh}`);
       
-      const summary = await databaseComponent.countItemsByKind(forceRefresh);
-      console.log("Router: Summary generated successfully");
-      res.status(200).json(summary);
+      const cachedResults = await redisService.redisClient.get('summary:items_by_kind');
+      
+      if (forceRefresh || !cachedResults) {
+        console.log("Router: Queueing summary update request");
+        const token = req.headers['acapy-token'] as string || '';
+        await messageService.queueSummaryUpdate(token);
+        
+        if (cachedResults) {
+          console.log("Router: Returning cached results while update is queued");
+          res.status(200).json({
+            data: JSON.parse(cachedResults),
+            status: 'updating',
+            cached: true
+          });
+        } else {
+          console.log("Router: No cached data available, informing client to retry");
+          res.status(202).json({
+            message: "Summary data is being generated, please retry in a few seconds",
+            status: 'generating'
+          });
+        }
+        return;
+      }
+      
+      console.log("Router: Returning cached summary data");
+      res.status(200).json(JSON.parse(cachedResults));
     } catch (error: any) {
-      console.error("Router: Error generating summary:", error);
+      console.error("Router: Error handling summary request:", error);
       res.status(500).json({
         error: "Database or API error",
         details: error.message,

@@ -38,6 +38,7 @@ export const checkRedisHealth = async (): Promise<boolean> => {
 
 export const QUEUES = {
   MESSAGES: 'queue:messages',
+  SUMMARY: 'queue:summary',
 };
 
 export const addToQueue = async (queueName: string, data: any): Promise<void> => {
