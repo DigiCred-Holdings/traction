@@ -146,17 +146,18 @@ router.get(
         
         if (cachedResults) {
           console.log("Router: Returning cached results while update is queued");
-          res.status(200).json({
-            data: JSON.parse(cachedResults),
-            status: 'updating',
-            cached: true
-          });
+          res.status(200).json(JSON.parse(cachedResults));
         } else {
-          console.log("Router: No cached data available, informing client to retry");
-          res.status(202).json({
-            message: "Summary data is being generated, please retry in a few seconds",
-            status: 'generating'
-          });
+          console.log("Router: No cached data available, returning empty summary data");
+          const defaultSummary = [
+            { kind: "Connection", kind_id: 1, count: 0, source: 'acapy' },
+            { kind: "Credential", kind_id: 2, count: 0, source: 'acapy' },
+            { kind: "Invited", kind_id: 3, count: 0, source: 'acapy' },
+            { kind: "Message", kind_id: 4, count: 0, source: 'acapy' },
+            { kind: "Transcript", kind_id: 5, count: 0, source: 'acapy' },
+            { kind: "Failed", kind_id: 6, count: 0, source: 'acapy' }
+          ];
+          res.status(200).json(defaultSummary);
         }
         return;
       }

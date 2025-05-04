@@ -51,7 +51,7 @@ export const queueSummaryUpdate = async (token: string = ''): Promise<void> => {
 
 export const processMessageFromQueue = async (): Promise<boolean> => {
   try {
-    const messageItem = await redisService.getFromQueue(redisService.QUEUES.MESSAGES, 0);
+    const messageItem = await redisService.getFromQueue(redisService.QUEUES.MESSAGES, 5);
     
     if (messageItem) {
       console.log(`Processing message to connection ${messageItem.connectionId}`);
@@ -67,7 +67,7 @@ export const processMessageFromQueue = async (): Promise<boolean> => {
       return true;
     }
     
-    const summaryItem = await redisService.getFromQueue(redisService.QUEUES.SUMMARY, 0);
+    const summaryItem = await redisService.getFromQueue(redisService.QUEUES.SUMMARY, 5);
     
     if (summaryItem) {
       console.log('Processing summary update request');
