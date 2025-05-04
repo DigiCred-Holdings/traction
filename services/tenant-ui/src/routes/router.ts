@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import config from "config";
 import * as emailComponent from "../components/email";
 import * as innkeeperComponent from "../components/innkeeper";
-import * as databaseComponent from "../components/database";
 import { body, validationResult } from "express-validator";
 import { NextFunction } from "express";
 import oidcMiddleware from "../middleware/oidcMiddleware";
