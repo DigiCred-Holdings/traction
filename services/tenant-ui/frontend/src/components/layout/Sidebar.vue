@@ -118,6 +118,11 @@ const sidebarItems = [
     route: '/messages/recent',
   },
   {
+    label: 'Broadcast',
+    icon: 'pi pi-fw pi-megaphone',
+    route: '/messages-new',
+  },
+  {
     label: t('about.about'),
     icon: 'pi pi-fw pi-question-circle',
     route: '/about',

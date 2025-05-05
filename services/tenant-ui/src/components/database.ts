@@ -1,10 +1,10 @@
 import { Pool } from "pg";
 import dotenv from "dotenv";
+import acaPyService from '../services/acapy-service';
+import redisService from '../services/redis-service';
 
-// Load environment variables
 dotenv.config();
 
-// Create a database configuration from environment variables
 const dbConfig = {
   host: process.env.POSTGRESQL_HOST || "localhost",
   port: parseInt(process.env.POSTGRESQL_PORT || "5432"),
@@ -12,398 +12,189 @@ const dbConfig = {
   user: process.env.POSTGRESQL_USER || "postgres",
   password: process.env.POSTGRESQL_PASSWORD || "postgresPass",
 };
+const redisConfig = {
+  ttl: parseInt(process.env.REDIS_TTL || "3600"),
+};
 
-// Create a pool instance
 const pool = new Pool(dbConfig);
 
-// Log connection info on startup (hide password)
-console.log("Database: Connecting with parameters:", {
-  host: dbConfig.host,
-  port: dbConfig.port,
-  database: dbConfig.database,
-  user: dbConfig.user,
-});
-
-/**
- * Get all items from the postgres.items table with formatted binary data
- * @returns {Promise<Array>} The array of items with formatted data
- */
-export const getAllItems = async () => {
-  console.log("Database: Executing getAllItems query from postgres schema");
-
-  try {
-    // Remove created_at and updated_at columns that don't exist
-    const result = await pool.query(`
-      SELECT 
-        id,
-        kind,
-        profile_id,
-        encode(category, 'hex') as category_hex,
-        encode(name, 'escape') as name_text,
-        encode(value, 'escape') as value_text
-      FROM 
-        postgres.items
-    `);
-
-    console.log("Database: Query returned", result.rows.length, "rows");
-
-    // Format the results to be more readable
-    const formattedItems = result.rows.map((item) => ({
-      id: item.id,
-      kind: formatKind(item.kind),
-      profile_id: item.profile_id,
-      category: item.category_hex,
-      name: item.name_text || "[Binary data]",
-      value: item.value_text || "[Binary data]",
-    }));
-
-    return formattedItems;
-  } catch (error) {
-    console.error("Database: Error fetching items:", error);
-    throw error;
-  }
-};
-
-/**
- * Format kind value to be more readable
- */
-function formatKind(kind: number): string {
-  const kinds: Record<number, string> = {
-    1: "Connection",
-    2: "Credential",
-    3: "Message",
-    4: "Key",
-    5: "Proof",
-  };
-
-  return kinds[kind] || `Type ${kind}`;
+export enum ItemKind {
+  Connection = "Connection",
+  Credential = "Credential",
+  Message = "Message",
+  Transcript = "Transcript",
+  Invited = "Invited",
+  Failed = "Failed"
 }
 
-
-/**
- * Count items by category with credential type extraction
- */
-export const countItemsByCategory = async () => {
-  console.log(
-    "Database: Counting items by category with credential type extraction"
-  );
+export const countItemsByKind = async (forceRefresh: boolean = false) => {
+  console.log("Database: Counting items by kind (type) using ACA-Py API for connections and credentials only");
+  console.log(`Force refresh requested: ${forceRefresh}`);
 
   try {
-    // Try to extract more meaningful data from the items
-    const query = `
-      WITH item_data AS (
-        SELECT 
-          encode(category, 'hex') as category_hex,
-          encode(name, 'escape') as name_text,
-          encode(value, 'escape') as value_text,
-          kind,
-          id
-        FROM 
-          postgres.items
-      )
-      SELECT 
-        category_hex,
-        name_text,
-        COUNT(*) as count,
-        kind,
-        array_agg(id) as item_ids
-      FROM 
-        item_data
-      GROUP BY 
-        category_hex, name_text, kind
-      ORDER BY 
-        count DESC, category_hex
-    `;
-
-    const result = await pool.query(query);
-    console.log(
-      "Database: Found",
-      result.rows.length,
-      "different categories with names"
-    );
-
-    // Format the results with readable kind values and extract credential types
-    const formattedResults = result.rows.map((row) => {
-      // Try to extract credential type from name_text or format the hexadecimal category
-      let credentialType = "Unknown";
-
-      // First check if name_text contains useful information
-      if (row.name_text && row.name_text.length > 0) {
-        try {
-          // Remove non-printable characters
-          const cleanedText = row.name_text.replace(/[^\x20-\x7E]/g, "");
-          if (cleanedText.length > 0) {
-            credentialType = cleanedText;
-          }
-        } catch (e) {
-          console.log("Error processing name_text:", e);
-        }
-      }
-
-      return {
-        category_hex: row.category_hex,
-        credential_type: credentialType,
-        count: parseInt(row.count),
-        kind: formatKind(row.kind),
-        item_ids: row.item_ids,
-      };
-    });
-
-    return formattedResults;
-  } catch (error) {
-    console.error("Database: Error counting items by category:", error);
-    throw error;
-  }
-};
-
-/**
- * Get items by profile and kind for analysis
- */
-export const getItemsByProfileAndKind = async () => {
-  try {
-    const query = `
-      SELECT 
-        p.id as profile_id,
-        i.kind,
-        COUNT(*) as count
-      FROM 
-        postgres.items i
-      JOIN 
-        postgres.profiles p ON i.profile_id = p.id
-      GROUP BY 
-        p.id, i.kind
-      ORDER BY 
-        p.id, i.kind
-    `;
-
-    const result = await pool.query(query);
-    return result.rows;
-  } catch (error) {
-    console.error(
-      "Database: Error analyzing items by profile and kind:",
-      error
-    );
-    throw error;
-  }
-};
-
-/**
- * Get a specific item by ID
- * @param {number} id The item ID to retrieve
- * @returns {Promise<Object>} The item object
- */
-export const getItemById = async (id: number) => {
-  try {
-    // Use postgres schema
-    const result = await pool.query(
-      "SELECT * FROM postgres.items WHERE id = $1",
-      [id]
-    );
-    return result.rows.length ? result.rows[0] : null;
-  } catch (error) {
-    console.error(`Error fetching item by ID: ${error}`);
-    throw error;
-  }
-};
-
-/**
- * Get all profiles from the postgres.profiles table
- * @returns {Promise<Array>} The array of profiles
- */
-export const getAllProfiles = async () => {
-  try {
-    const result = await pool.query("SELECT * FROM postgres.profiles");
-    return result.rows;
-  } catch (error) {
-    console.error("Error fetching profiles:", error);
-    throw error;
-  }
-};
-
-/**
- * Get all configuration from the postgres.config table
- * @returns {Promise<Array>} The array of config entries
- */
-export const getConfiguration = async () => {
-  try {
-    const result = await pool.query("SELECT * FROM postgres.config");
-    return result.rows;
-  } catch (error) {
-    console.error("Error fetching configuration:", error);
-    throw error;
-  }
-};
-
-/**
- * Get data from a specific table in the postgres schema
- * @param {string} tableName The name of the table without schema prefix
- * @param {number} limit Maximum number of rows to return
- * @returns {Promise<Array>} The array of rows
- */
-export const getTableData = async (tableName: string, limit: number = 20) => {
-  try {
-    // Adding postgres schema and safely parameterizing the limit
-    const safeTableName = tableName.replace(/[^a-zA-Z0-9_]/g, ""); // Basic SQL injection protection
-    const query = `SELECT * FROM postgres.${safeTableName} LIMIT $1`;
-    const result = await pool.query(query, [limit]);
-    return result.rows;
-  } catch (error) {
-    console.error(`Error fetching data from table ${tableName}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Get all database tables
- * @returns {Promise<Array>} List of tables in the database
- */
-export const getTables = async () => {
-  try {
-    const result = await pool.query(`
-      SELECT tablename 
-      FROM pg_tables 
-      WHERE schemaname = 'public'
-      ORDER BY tablename;
-    `);
-    return result.rows.map((row) => row.tablename);
-  } catch (error) {
-    console.error("Error fetching tables:", error);
-    throw error;
-  }
-};
-
-/**
- * Get schema for a specific table
- * @param {string} tableName The name of the table
- * @returns {Promise<Array>} Column information for the table
- */
-export const getTableSchema = async (tableName: any) => {
-  try {
-    const result = await pool.query(
-      `
-      SELECT column_name, data_type, is_nullable
-      FROM information_schema.columns
-      WHERE table_schema = 'public' AND table_name = $1
-      ORDER BY ordinal_position;
-    `,
-      [tableName]
-    );
-    return result.rows;
-  } catch (error) {
-    console.error(`Error fetching schema for table ${tableName}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Get all wallet items - main method used by the API
- */
-export const getAllItemsFromPublicSchema = async () => {
-  console.log("Database: Fetching wallet database information");
-
-  try {
-    // Get list of tables
-    const tables = await getTables();
-    console.log("Database: Found tables:", tables);
-
-    // If we have no tables, return sample data
-    if (tables.length === 0) {
-      return [
-        { id: 1, name: "Sample Item 1", description: "This is a sample item" },
-        { id: 2, name: "Sample Item 2", description: "Another sample item" },
-      ];
-    }
-
-    // Return information about the database
-    const databaseInfo: any = {
-      database: dbConfig.database,
-      tables: tables,
-      tableDetails: [],
+    type SummaryItem = {
+      kind: ItemKind;
+      kind_id: number;
+      count: number;
+      source: string;
     };
 
-    // Get schema and sample data for a few important tables (limit to 3 to avoid too much data)
-    const importantTables = tables.slice(0, 3);
-    for (const tableName of importantTables) {
-      const schema = await getTableSchema(tableName);
-      const sampleData = await getTableData(tableName, 5); // Limit to 5 rows per table
-
-      databaseInfo.tableDetails.push({
-        name: tableName,
-        schema: schema,
-        sampleData: sampleData,
-        rowCount: sampleData.length,
-      });
-    }
-
-    return databaseInfo;
-  } catch (error: any) {
-    console.error("Database: Error fetching database info:", error);
-    return [
-      { error: "Error fetching database info", details: error.message },
-      { id: 1, name: "Sample Item 1", description: "This is a sample item" },
-    ];
-  }
-};
-
-/**
- * Count items grouped by kind (for summary)
- */
-export const countItemsByKind = async () => {
-  console.log("Database: Counting items by kind (type)");
-
-  try {
-    const query = `
-      SELECT 
-        kind,
-        COUNT(*) as count
-      FROM 
-        postgres.items 
-      GROUP BY 
-        kind 
-      ORDER BY 
-        kind
-    `;
-
-    const result = await pool.query(query);
-    console.log(
-      "Database: Found counts for",
-      result.rows.length,
-      "different kinds"
-    );
-
-    
-    // Format the results with readable kind values
-    let formattedResults = result.rows.map((row: any) => ({
-      kind: formatKind(row.kind),
-      kind_id: row.kind,
-      count: parseInt(row.count),
-    }));
-
-    const connections = formattedResults.find((item: any) => item.kind === "Connection")?.count || 0;
-    const credentials = formattedResults.find((item: any) => item.kind === "Credential")?.count || 0;
-    
-    let updatedConnections = Math.floor(connections / 2);
-    let updatedCredentials = credentials - (updatedConnections * 6) - 3;
-    
-    if (updatedConnections < 0) {
-      updatedConnections = 0;
-    }
-    if (updatedCredentials < 0) {
-      updatedCredentials = 0;
-    }
-
-    formattedResults = formattedResults.map((item: any) => {
-      if (item.kind === "Connection") {
-        return { kind: "Connection", kind_id: 1, count: updatedConnections };
+    if (!forceRefresh) {
+      const cachedResults = await redisService.redisClient.get('summary:items_by_kind');
+      if (cachedResults) {
+        console.log("Using cached results from Redis");
+        return JSON.parse(cachedResults);
       }
-      return item;
+    } else {
+      console.log("Cache bypassed due to force refresh request.");
+    }
+
+    const formattedResults: SummaryItem[] = [];
+
+    let connectionCount = 0;
+    let connectionDetails = [];
+    try {
+      const connectionsResponse = await acaPyService.getConnections();
+
+      if (connectionsResponse && connectionsResponse.results) {
+        connectionCount = connectionsResponse.results.length;
+        connectionDetails = connectionsResponse.results.map((conn: any) => ({
+          id: conn.connection_id,
+          state: conn.state,
+          alias: conn.alias || 'Unknown',
+          created_at: conn.created_at
+        }));
+        console.log(`AcaPy API returned ${connectionCount} connections`);
+        
+        await redisService.redisClient.set('connections:all', JSON.stringify(connectionDetails), {
+          EX: redisConfig.ttl
+        });
+      } else {
+        console.log('AcaPy API returned no connections or unexpected format');
+        
+        const cachedConnections = await redisService.redisClient.get('connections:all');
+        if (cachedConnections) {
+          connectionDetails = JSON.parse(cachedConnections);
+          connectionCount = connectionDetails.length;
+          console.log(`Using ${connectionCount} cached connections from Redis`);
+        }
+      }
+    } catch (error: any) {
+      console.warn(`Could not fetch connections from ACA-Py API: ${error.message}`);
+      
+      const cachedConnections = await redisService.redisClient.get('connections:all');
+      if (cachedConnections) {
+        connectionDetails = JSON.parse(cachedConnections);
+        connectionCount = connectionDetails.length;
+        console.log(`Using ${connectionCount} cached connections from Redis after API error`);
+      }
+    }
+
+    let credentialCount = 0;
+    let credentialDetails = {
+      legacy: [] as any[],
+      w3c: [] as any[]
+    };
+
+    try {
+      const credentialsResponse = await acaPyService.getAllCredentials();
+
+      if (credentialsResponse) {
+        credentialCount = credentialsResponse.total || 0;
+        credentialDetails.legacy = credentialsResponse.credentials || [];
+        console.log(`AcaPy API returned ${credentialCount} credentials (${credentialDetails.legacy.length} legacy, ${credentialDetails.w3c.length} W3C)`);
+        
+        await redisService.redisClient.set('credentials:all', JSON.stringify(credentialDetails), {
+          EX: redisConfig.ttl
+        });
+      } else {
+        console.log('AcaPy API returned no credentials or unexpected format');
+        
+        const cachedCredentials = await redisService.redisClient.get('credentials:all');
+        if (cachedCredentials) {
+          credentialDetails = JSON.parse(cachedCredentials);
+          credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
+          console.log(`Using cached credentials from Redis`);
+        }
+      }
+    } catch (error: any) {
+      console.warn(`Could not fetch credentials from ACA-Py API: ${error.message}`);
+      
+      const cachedCredentials = await redisService.redisClient.get('credentials:all');
+      if (cachedCredentials) {
+        credentialDetails = JSON.parse(cachedCredentials);
+        credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
+        console.log(`Using cached credentials from Redis after API error`);
+      }
+    }
+
+    const filteredConnections = connectionDetails.filter((conn: any) => conn.state === 'active');
+    
+    await redisService.redisClient.set('connections:active', JSON.stringify(filteredConnections), {
+      EX: redisConfig.ttl 
     });
 
-    formattedResults = formattedResults.map((item: any) => {
-      if (item.kind === "Credential") {
-        return { kind: "Credential", kind_id: 2, count: updatedCredentials };
-      }
-      return item;
+    formattedResults.push({
+      kind: ItemKind.Connection,
+      kind_id: 1,
+      count: filteredConnections.length,
+      source: 'acapy',
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Credential,
+      kind_id: 2,
+      count: credentialCount,
+      source: 'acapy',
+    });
+
+    console.log("connectionDetails", connectionDetails);
+    const invitedConnections = connectionDetails.filter((conn: any) => conn.state === 'request' || conn.state === 'invitation');
+    
+    await redisService.redisClient.set('connections:invited', JSON.stringify(invitedConnections), {
+      EX: redisConfig.ttl 
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Invited,
+      kind_id: 3,
+      count: invitedConnections.length,
+      source: 'acapy',
+    });
+
+    const failedConnections = connectionDetails.filter((conn: any) => conn.state === 'error');
+
+    await redisService.redisClient.set('connections:failed', JSON.stringify(failedConnections), {
+      EX: redisConfig.ttl
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Failed,
+      kind_id: 6,
+      count: failedConnections.length,
+      source: 'acapy',
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Message,
+      kind_id: 4,
+      count: 0,
+      source: 'acapy',
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Transcript,
+      kind_id: 5,
+      count: 0,
+      source: 'acapy',
+    });
+
+    console.log("\n=== Summary by Kind (ACA-Py data only) ===");
+    formattedResults.forEach((item: any) => {
+      console.log(`${item.kind} (${item.kind_id}): ${item.count} items from ${item.source}`);
+    });
+    await redisService.redisClient.set('summary:items_by_kind', JSON.stringify(formattedResults), {
+      EX: redisConfig.ttl 
     });
 
     console.log("\n=== Summary by Kind ===");
@@ -418,8 +209,40 @@ export const countItemsByKind = async () => {
   }
 };
 
-// Add error handling for the database connection
+export const getActiveConnections = async (): Promise<any[]> => {
+  try {
+    const connectionsResponse = await acaPyService.getConnections();
+    if (connectionsResponse && connectionsResponse.results) {
+      const connections = connectionsResponse.results;
+      const activeConnections = connections.filter((conn: any) => conn.state === 'active');
+      
+      await redisService.redisClient.set('connections:active', JSON.stringify(activeConnections), {
+        EX: redisConfig.ttl 
+      });
+      
+      return activeConnections;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error("Error getting active connections:", error);
+    throw error;
+  }
+};
+
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);
+});
+
+process.on('SIGINT', async () => {
+  console.log('Shutting down...');
+  await pool.end();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Shutting down...');
+  await pool.end();
+  process.exit(0);
 });

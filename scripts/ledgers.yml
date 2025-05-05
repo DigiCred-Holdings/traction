@@ -2,11 +2,11 @@
   is_production: true
   is_write: true
   genesis_url: "http://genesis.digicred.services:9000/genesis"
-  endorser_did: "7J2doVr9uXjBiNzqNqxS5N"
+  endorser_did: 'SVfHGCEEvEFmpBPcxgNqRR'
   endorser_alias: "digicred-endorser"
 - id: digicred-1
   is_production: true
   is_write: true
   genesis_url: "http://genesis.digicred.services:9000/genesis"
-  endorser_did: "BjsXtPhnhFz1AgyVRrUmf4"
+  endorser_did: 'SVfHGCEEvEFmpBPcxgNqRR'
   endorser_alias: "digicred-endorser-1"

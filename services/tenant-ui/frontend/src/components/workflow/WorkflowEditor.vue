@@ -21,7 +21,7 @@
           v-model="jsonData"
           :stringified="false"
           style="height: 65vh"
-          @update:modelValue="onEditorUpdate"
+          @update:model-value="onEditorUpdate"
         />
       </div>
     </div>

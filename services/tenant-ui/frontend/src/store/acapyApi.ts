@@ -41,6 +41,9 @@ export const useAcapyApi = defineStore('acapyApi', () => {
         auth = authOverride;
       }
 
+      console.log('AcaPy API Request - Auth header:', auth);
+      console.log('AcaPy API Request - Token from store:', tokenStore.token);
+
       const result = {
         ...dataConfig,
         headers: {

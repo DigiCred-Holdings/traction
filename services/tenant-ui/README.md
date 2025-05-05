@@ -150,3 +150,62 @@ For more information on configuration settings see
 ## Log Streaming
 
 The Tenant UI can display streamed logs from a Loki aggregator. For details on setup, see ["Optional Local Log Streaming Setup" in the scripts README](../../scripts/README.md)
+
+## Message Broadcasting Feature
+
+The Tenant UI now includes a feature for broadcasting messages to all active connections. This feature uses Redis queues to manage the message sending process, ensuring reliable delivery even with a large number of connections.
+
+### How It Works
+
+1. **Frontend Interface**: The frontend provides a simple interface for composing a message and sending it to all connections.
+
+2. **Backend Process**: When a broadcast is initiated:
+   - The message is queued in Redis for each active connection
+   - The queue processor handles sending messages to each connection asynchronously
+   - Status updates are provided back to the UI
+
+3. **Queue Processing**: A separate process monitors the Redis queue and sends messages to connections:
+   - Messages are sent one at a time to avoid overloading the ACA-Py agent
+   - If errors occur, the process continues to ensure all messages are attempted
+   - Detailed logs are generated for debugging purposes
+
+### Running the System
+
+#### Start the Queue Processor
+
+To process messages in the queue, run:
+
+```bash
+npm run queue-processor
+```
+
+Keep this process running alongside the main server to ensure messages are processed. You may want to use a process manager like PM2 in production.
+
+#### Using the Broadcasting Feature
+
+1. Navigate to the Messages section in the UI
+2. Compose your message in the text area
+3. Click "Send to All Connections"
+4. Review the list of connections and click "Start Broadcast"
+5. Monitor the status of each message delivery
+
+### Technical Details
+
+- **Redis Queues**: Messages are stored in Redis lists for reliable delivery
+- **Async Processing**: Messages are processed asynchronously to avoid blocking the main server
+- **Error Handling**: Robust error handling ensures the system continues working even if some messages fail
+- **Connection Caching**: Active connections are cached in Redis to reduce API calls
+
+### API Endpoints
+
+- `POST /api/messages/broadcast`: Queue a message for broadcast to all active connections
+  - Request body: `{ "message": "Your message content" }`
+  - Returns: `{ "success": true, "queued": 42, "connections": [...] }`
+
+### Configuration
+
+The Redis configuration can be adjusted in the environment variables:
+
+- `REDIS_HOST`: Redis server hostname (default: localhost)
+- `REDIS_PORT`: Redis server port (default: 6379)
+- `REDIS_TTL`: Cache TTL in seconds (default: 3600)
