@@ -5,7 +5,7 @@ USER root
 ENV POETRY_VERSION=1.8.3
 ENV POETRY_HOME=/opt/poetry
 RUN apt-get update && apt-get install -y curl && apt-get clean
-RUN curl -sSL https://install.python-poetry.org | python -
+RUN curl -sSL https://install.python-poetry.org | python - --version $POETRY_VERSION
 
 ENV PATH="/opt/poetry/bin:$PATH"
 RUN poetry config virtualenvs.in-project true
@@ -18,10 +18,15 @@ COPY --chown=aries:aries pyproject.toml README.md ./
 # these should come from github or some version, published location
 COPY --chown=aries:aries traction_innkeeper ./traction_innkeeper
 
-RUN poetry install --only main
+# Use pip directly to avoid poetry/virtualenv conflicts
+RUN python -m venv /home/aries/.venv && \
+    . /home/aries/.venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install acapy-agent==1.2.4 python-dateutil typing-extensions && \
+    cd traction_innkeeper && pip install -e . && cd ..
 
 # Make site packages location more accessible (for use with volumes)
-RUN ln -s $(poetry env info -p)/lib/python3.6/site-packages site-packages
+RUN ln -s /home/aries/.venv/lib/python3.12/site-packages site-packages
 
 
 FROM --platform=$BUILDPLATFORM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2
