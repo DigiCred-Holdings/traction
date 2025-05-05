@@ -15,7 +15,6 @@
       />
       <Card
         title="Invited"
-
         :value="
           String(summary.find((item) => item.kind === 'Invited')?.count || 0)
         "
@@ -41,11 +40,11 @@
     <button
       class="p-button p-button-sm p-button-rounded p-button-text absolute bottom-0 right-0 mb-3 mr-3"
       style="z-index: 10"
-      @click="fetchSummaryData(true)"
       v-tooltip.left="'Refresh Data'"
+      @click="fetchSummaryData(true)"
     >
-      <i class="pi pi-refresh"></i></button
-    >
+      <i class="pi pi-refresh"></i>
+    </button>
   </div>
 </template>
 <script setup lang="ts">
@@ -112,9 +111,7 @@ const fetchSummaryData = async (forceRefresh: boolean = false) => {
       config.headers.Authorization
     );
 
-    const response = await axios.get<SummaryItem[]>(
-      apiUrl, config
-    );
+    const response = await axios.get<SummaryItem[]>(apiUrl, config);
     summary.value = response.data;
     console.log('Dashboard: Summary data received:', summary.value);
 

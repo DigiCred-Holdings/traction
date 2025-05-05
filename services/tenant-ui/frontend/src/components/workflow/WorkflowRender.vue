@@ -120,7 +120,7 @@ onMounted(() => {
   background-color: #e0e0e0;
   padding: 0 0.5rem;
   color: black;
-  text-align-last:start; 
+  text-align-last: start;
   display: flex;
   flex-direction: column;
   border: 1px solid $tenant-ui-new-accent-color;
@@ -143,10 +143,10 @@ onMounted(() => {
   margin: 0.25rem 0;
 }
 
-.block button{
+.block button {
   background-color: $tenant-ui-new-accent-color;
   color: white;
-  width:100%;
+  width: 100%;
   justify-content: center;
 }
 </style>

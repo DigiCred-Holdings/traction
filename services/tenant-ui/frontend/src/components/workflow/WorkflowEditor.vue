@@ -28,13 +28,13 @@
     <!-- <div class="resizer vertical" @mousedown="e => startResize(e, 'vertical')"></div> -->
     <!-- Right Panel -->
     <div ref="topRightPane" class="render-panel">
-        {{
-          console.log(
-            `WorkflowEditor: ${jsonData.name}:`,
-            JSON.stringify(jsonData, null, 2)
-          )
-        }}
-        <WorkflowCard :data="workflowData" />
+      {{
+        console.log(
+          `WorkflowEditor: ${jsonData.name}:`,
+          JSON.stringify(jsonData, null, 2)
+        )
+      }}
+      <WorkflowCard :data="workflowData" />
       <!-- <div class="resizer horizontal" @mousedown="e => startResize(e, 'horizontal')"></div> -->
       <div ref="bottomRightPane" class="bottom">
         <Button
@@ -211,7 +211,6 @@ const save = async () => {
 
   try {
     if (webhookUrl) {
-
       console.log(
         `Sending ${update ? 'update' : 'create'} request for workflow`
       );

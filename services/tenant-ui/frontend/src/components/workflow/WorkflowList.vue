@@ -1,5 +1,4 @@
 <template>
-
   <DataTable
     v-model:expanded-rows="expandedRows"
     v-model:filters="filter"
