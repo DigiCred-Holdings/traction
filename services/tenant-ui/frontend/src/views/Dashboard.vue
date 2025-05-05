@@ -15,10 +15,11 @@
       />
       <Card
         title="Invited"
+
         :value="
           String(summary.find((item) => item.kind === 'Invited')?.count || 0)
         "
-      />
+      /> 
       <Card
         title="Failed"
         :value="

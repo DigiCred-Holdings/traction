@@ -46,6 +46,11 @@ const sidebarItems = [
     route: '/onboarding',
   },
   {
+    label: t('transcript.sendTranscript'),
+    icon: 'pi pi-fw pi-book',
+    route: '/transcript',
+  },
+  {
     label: t('workflow.workflow'),
     icon: 'pi pi-fw pi-file-edit',
     route: '/workflow-list',
@@ -85,11 +90,6 @@ const sidebarItems = [
     label: t('common.credentials'),
     icon: 'pi pi-fw pi-wallet',
     route: '/holder/credentials',
-  },
-  {
-    label: t('transcript.transcript'),
-    icon: 'pi pi-fw pi-book',
-    route: '/transcript',
   },
   {
     label: t('configuration.configuration'),

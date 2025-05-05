@@ -46,7 +46,7 @@
       </p>
       <Button
         v-else-if="block.type === 'button'"
-        class="btn pi-button text-white font-semibold"
+        class="font-semibold"
         @click="handleAction(block.actionID)"
       >
         {{ block.label }}
@@ -107,24 +107,28 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .block {
-  margin-bottom: 1rem;
-  text-align: center;
+  margin-bottom: 0.5rem;
+  text-align: left;
 }
 .card {
-  max-width: 80%;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  background-color: #c8c8ce;
-  padding: 0.5rem;
+  max-width: 90%;
+  max-height: 45rem;
+  border-radius: 5px;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.11);
+  background-color: #e0e0e0;
+  padding: 0 0.5rem;
   color: black;
+  text-align-last:start; 
   display: flex;
   flex-direction: column;
+  border: 1px solid $tenant-ui-new-accent-color;
+  overflow-y: auto;
 }
+
 .image {
-  max-width: 100%;
-  border-radius: 1rem;
+  max-width: 30%;
 }
 
 .title {
@@ -137,5 +141,12 @@ onMounted(() => {
 .extended {
   font-size: 1rem;
   margin: 0.25rem 0;
+}
+
+.block button{
+  background-color: $tenant-ui-new-accent-color;
+  color: white;
+  width:100%;
+  justify-content: center;
 }
 </style>

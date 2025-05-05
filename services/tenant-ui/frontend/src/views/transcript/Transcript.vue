@@ -1,258 +1,150 @@
 <template>
-  <MainCardContent :title="$t('transcript.transcript')">
-    <Panel class="mb-5" header="Transcript Form">
-      <form
-        class="transcript-form"
-        @submit.prevent="handleSubmit(!v$.$invalid)"
-      >
-        <!-- Connection -->
-        <div class="field mt-5">
-          <label
-            for="selectedConnection"
-            :class="{
-              'p-error': v$.selectedConnection.$invalid && submitted,
-            }"
-            >{{ $t('common.connectionName') }}
-            <ProgressSpinner v-if="connectionLoading" />
-          </label>
-          <div class="flex align-items-center">
-            <AutoComplete
-              id="selectedConnection"
-              v-model="v$.selectedConnection.$model"
-              class="w-full"
-              :disabled="connectionLoading"
-              :suggestions="connectionsList"
-              :dropdown="true"
-              option-label="label"
-              force-selection
-              @complete="searchConnections($event)"
-            />
-            <span v-if="metaDataLoading" class="ml-2">
-              <i class="pi pi-spin pi-spinner" style="font-size: 1.2em" />
-            </span>
-          </div>
-
-          <small
-            v-if="v$.selectedConnection.$invalid && submitted"
-            class="p-error"
-            >{{ v$.selectedConnection.required.$message }}</small
-          >
-          <div v-if="!isMetaData" class="field">
-            <span class="p-error"> {{ $t('transcript.noMetaData') }}</span>
-            <label for="studentID" class="mt-2">{{
-              $t('transcript.studentID')
-            }}</label>
+  <div class="row flex flex-wrap main-transcript lg:ml-0 lg:mt-0">
+    <div class="xl:col-6 col-12">
+      <div class="title mb-2">
+        {{ $t('transcript.sendATranscript') }}
+      </div>
+      <div class="description mb-5">
+        {{ $t('transcript.enterTheStudentID') }}
+      </div>
+      <form>
+        <div class="field relative">
+          <IconField icon-position="left">
+            <InputIcon>
+              <svg-icon
+                type="mdi"
+                :path="mdiCardAccountDetailsOutline"
+                class="icon-size"
+              ></svg-icon>
+            </InputIcon>
             <InputText
-              id="studentID"
+              id="studentId"
               v-model="v$.studentID.$model"
+              type="text"
+              placeholder="Student ID"
+              name="studentId"
               required
-              @input="transcriptContent = ''"
             />
-            <Button
-              :label="$t('transcript.findTranscript')"
-              icon="pi pi-search"
-              class="ml-2"
-              :disabled="!v$.studentID.$model || transcriptLoading"
-              @click="getTranscript(v$.studentID.$model)"
-            />
-            <span v-if="transcriptLoading" class="ml-2">
-              <i class="pi pi-spin pi-spinner" style="font-size: 1.2em" />
-            </span>
-            <div v-if="transcriptContent === false" class="p-error">
-              {{ $t('transcript.noTranscript') }}
-            </div>
-          </div>
-          <div
-            v-if="transcriptContent && !transcriptLoading"
-            class="pt-4 transcriptContent"
-          >
-            <!-- TODO: 'v-html' directive can lead to XSS attack. -->
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="taa-html mb-4" v-html="svg?.data" />
-            <!-- <Card>
-              <template #content>
-                <div>
-                  <strong>{{ `${$t('transcript.studentID')}: ` }}</strong>
-                  {{ metadataMap?.results?.student_id }}
-                </div>
-                <div>
-                  <strong>{{ `${$t('transcript.firstName')}: ` }}</strong>
-                  {{ metadataMap?.results?.first_name }}
-                </div>
-                <div>
-                  <strong>{{ `${$t('transcript.lastName')}: ` }}</strong
-                  >{{ metadataMap?.results?.last_name }}
-                </div>
-                <hr />
-                <div
-                  v-for="(course, index) in transcriptContent?.courseTranscript"
-                  :key="index"
-                >
-                  <div v-for="(value, key) in course" :key="key">
-                    <strong>{{ `${updateKey(key)}:` }}</strong>
-                    {{ value }}
-                  </div>
-                  <hr
-                    v-if="
-                      index !== transcriptContent?.courseTranscript?.length - 1
-                    "
-                  />
-                </div>
-              </template>
-            </Card> -->
-          </div>
-
+          </IconField>
           <Button
-            type="submit"
-            label="Send Transcript"
-            icon="pi pi-check"
-            class="mt-5"
-            :disabled="
-              connectionLoading || transcriptLoading || !transcriptContent
+            icon="pi pi-search"
+            class="button-id-lookup"
+            :disabled="!v$.studentID.$model || transcriptLoading"
+            @click="getTranscript(v$.studentID.$model)"
+          />
+          <span v-if="transcriptLoading" class="inline-block mt-2 ml-2">
+            <i class="pi pi-spin pi-spinner" style="font-size: 1.2em" />
+          </span>
+          <div v-if="transcriptContent === false" class="p-error">
+            {{ $t('transcript.noTranscript') }}
+          </div>
+        </div>
+
+        <div class="field fullNameInputContent">
+          <IconField icon-position="left">
+            <InputIcon>
+              <svg-icon
+                type="mdi"
+                :path="mdiCardBulletedOutline"
+                class="icon-size"
+              ></svg-icon>
+            </InputIcon>
+            <InputText
+              id="fullName"
+              v-model="fullName"
+              disabled
+              type="text"
+              placeholder="Full Name"
+              name="fullName"
+              required
+              class="fullNameInput"
+            />
+          </IconField>
+        </div>
+        <div class="form-actions flex justify-content-end">
+          <Button
+            :label="$t('transcript.viewTranscript')"
+            class="px-6 button-submit"
+            :disabled="transcriptLoading || !transcriptContent"
+            @click="
+              transcriptContent && !transcriptLoading ? (visible = true) : null
             "
-            :loading="connectionLoading"
           />
         </div>
       </form>
-    </Panel>
-  </MainCardContent>
+    </div>
+    <div class="xl:col-6 col-12">
+      <div class="title mb-4 text-center">
+        {{ $t('transcript.transcript') }}
+      </div>
+      <div class="transcript-img text-center">
+        <img src="/img/transcript/transcriptTemp.png" />
+      </div>
+    </div>
+  </div>
+
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Transcript"
+    :style="{ maxWidth: '100vw' }"
+  >
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <div class="taa-html mb-4" v-html="svg?.data"></div>
+
+    <Button
+      :label="$t('transcript.sendTranscript')"
+      class="px-6 button-submit"
+      :disabled="transcriptLoading || !transcriptContent"
+      type="submit"
+      @click="handleSubmit()"
+    />
+  </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useStudentStore, useConnectionStore, useIssuerStore } from '@/store';
-import Panel from 'primevue/panel';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import AutoComplete from 'primevue/autocomplete';
-import Card from 'primevue/card';
-import MainCardContent from '@/components/layout/mainCard/MainCardContent.vue';
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiCardAccountDetailsOutline, mdiCardBulletedOutline } from '@mdi/js';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import { onMounted, reactive, ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import useGetItem from '@/composables/useGetItem';
-import { API_PATH } from '@/helpers/constants';
 import { useToast } from 'vue-toastification';
+import { useConnectionStore, useStudentStore, useTenantStore } from '@/store';
+import { storeToRefs } from 'pinia';
 import { useSisApi } from '@/store/sisApi';
-import { useTenantStore } from '@/store';
+import Dialog from 'primevue/dialog';
+import { useIssuerStore } from '@/store/issuerStore';
+const visible = ref(false);
 
 const { getStudentInfo, idLookup } = useStudentStore();
-
 const toast = useToast();
-
+const fullName = ref('');
 // Metadata
 const metadataMap = ref();
-const isMetaData = ref(true);
-const metaDataLoading = ref(false);
-
+// const isMetaData = ref(true);
+// const metaDataLoading = ref(false);
 // Form and Validation
-const connectionsList = ref();
+// const connectionsList = ref();
 const formFields = reactive({
-  selectedConnection: undefined as any,
+  // selectedConnection: undefined as any,
   studentID: '',
 });
 const rules = {
-  selectedConnection: { required },
-  studentID: {
-    required: isMetaData.value ? false : required,
-  },
+  // selectedConnection: { required },
+  studentID: { required },
+  // studentID: {
+  //   required: isMetaData.value ? false : required,
+  // },
 };
 const v$ = useVuelidate(rules, formFields);
 // State
-const connectionStore = useConnectionStore();
-const { connectionsDropdown, loading: connectionLoading } =
-  storeToRefs(useConnectionStore());
-
-const searchConnections = (event: any) => {
-  if (!event.query.trim().length) {
-    connectionsList.value = [...(connectionsDropdown as any).value];
-  } else {
-    connectionsList.value = (connectionsDropdown.value as any).filter(
-      (connection: any) => {
-        return connection.label
-          .toLowerCase()
-          .includes(event.query.toLowerCase());
-      }
-    );
-  }
-};
-
-// Get Metadata
-const fetchMetadata = async (connection_id: string) => {
-  metaDataLoading.value = true;
-  const { item, fetchItem } = useGetItem(
-    API_PATH.CONNECTIONS_METADATA(connection_id)
-  );
-  await fetchItem();
-  if (item.value?.results?.student_id) {
-    metadataMap.value = item.value;
-    await getTranscript(metadataMap.value.results.student_id);
-    await createPayload();
-  } else {
-    isMetaData.value = false;
-  }
-  metaDataLoading.value = false;
-};
-
-// Get webHookUrl
-const { tenantWallet } = storeToRefs(useTenantStore());
-const tenantStore = useTenantStore();
-const webHookUrl = ref(null);
-const loadTenantSettings = async () => {
-  Promise.all([tenantStore.getTenantSubWallet()])
-    .then(() => {
-      webHookUrl.value = tenantWallet.value.settings['wallet.webhook_urls'][0];
-    })
-    .catch((err: any) => {
-      console.error(err);
-      toast.error(`Failure: ${err}`);
-    });
-};
-
-// Transcript
-const transcriptLoading = ref(false);
-const transcriptContent = ref();
-// Get transcript
-const getTranscript = async (student_id: string) => {
-  transcriptLoading.value = true;
-  if (webHookUrl.value) {
-    (await getStudentInfo(student_id, webHookUrl.value))
-      ? (transcriptContent.value = await getStudentInfo(
-          student_id,
-          webHookUrl.value
-        ))
-      : (transcriptContent.value = false);
-  } else {
-    (await getStudentInfo(student_id))
-      ? (transcriptContent.value = await getStudentInfo(student_id))
-      : (transcriptContent.value = false);
-  }
-
-  // There is a transcript but it's empty
-  if (transcriptContent.value?.courseTranscript?.length === 0) {
-    transcriptContent.value = false;
-  }
-  if (isMetaData.value === false && transcriptContent.value) {
-    let studentInfo;
-    if (webHookUrl.value) {
-      studentInfo = await idLookup(student_id, webHookUrl.value);
-    } else {
-      studentInfo = await idLookup(student_id);
-    }
-
-    if (studentInfo) {
-      metadataMap.value = {
-        results: {
-          last_name: studentInfo.studentIdCred?.lastName,
-          first_name: studentInfo.studentIdCred?.firstName,
-          student_id: studentInfo.studentIdCred?.studentsId,
-        },
-      };
-      await createPayload();
-    }
-  }
-  transcriptLoading.value = false;
-};
+// const connectionStore = useConnectionStore();
+// const { connectionsDropdown, loading: connectionLoading } =
+//   storeToRefs(useConnectionStore());
 
 // Payload
 const payload = ref();
@@ -264,10 +156,11 @@ const createPayload = async () => {
   const GPA =
     transcriptContent.value?.studentCumulativeTranscript[0]?.cumulativeGradePointAverage?.toString() ??
     '';
+  console.log(metadataMap, 'metadataMapmetadataMap');
   payload.value = {
     auto_issue: true,
     auto_remove: false,
-    connection_id: formFields.selectedConnection.value,
+    // connection_id: formFields.selectedConnection.value,
     cred_def_id: credentialDefinitionId.value,
     credential_preview: {
       '@type': 'issue-credential/1.0/credential-preview',
@@ -310,59 +203,96 @@ const createPayload = async () => {
   };
 };
 
-// Submit
-const issuerStore = useIssuerStore();
-const submitted = ref(false);
-// Submit function
-const handleSubmit = async (isFormValid: boolean) => {
-  submitted.value = true;
-  if (!isFormValid) {
-    return;
+// Transcript
+const transcriptLoading = ref(false);
+const transcriptContent = ref();
+// Get transcript
+const getTranscript = async (student_id: string) => {
+  transcriptLoading.value = true;
+  console.log(`webHookUrl.value: ${webHookUrl.value}`);
+  if (webHookUrl.value) {
+    (await getStudentInfo(student_id, webHookUrl.value))
+      ? (transcriptContent.value = await getStudentInfo(
+          student_id,
+          webHookUrl.value
+        ))
+      : (transcriptContent.value = false);
+  } else {
+    const studentInfo = await getStudentInfo(student_id);
+    if (studentInfo) {
+      transcriptContent.value = studentInfo;
+    } else {
+      transcriptContent.value = false;
+      transcriptLoading.value = false;
+    }
   }
+  if (transcriptContent.value) {
+    console.log(
+      `transcriptContent.value: ${transcriptContent.value.courseTranscript.length}`
+    );
+  }
+
+  // There is a transcript but it's empty
+  if (transcriptContent.value?.courseTranscript?.length === 0) {
+    transcriptContent.value = false;
+  }
+  // console.log(isMetaData.value, 'isMetaData.value');
+  if (transcriptContent.value) {
+    let studentInfo;
+    if (webHookUrl.value) {
+      studentInfo = await idLookup(student_id, webHookUrl.value);
+    } else {
+      studentInfo = await idLookup(student_id);
+    }
+
+    if (studentInfo) {
+      metadataMap.value = {
+        results: {
+          last_name: studentInfo.studentIdCred?.lastName,
+          first_name: studentInfo.studentIdCred?.firstName,
+          student_id: studentInfo.studentIdCred?.studentsId,
+        },
+      };
+      console.log(`metadataMap.value: ${metadataMap.value.results}`);
+      await createPayload();
+    }
+    fullName.value = `${metadataMap.value.results.first_name} ${metadataMap.value.results.last_name}`;
+  }
+  transcriptLoading.value = false;
+};
+
+// Get webHookUrl
+const { tenantWallet } = storeToRefs(useTenantStore());
+const tenantStore = useTenantStore();
+const webHookUrl = ref(null);
+const loadTenantSettings = async () => {
+  Promise.all([tenantStore.getTenantSubWallet()])
+    .then(() => {
+      webHookUrl.value = tenantWallet.value.settings['wallet.webhook_urls'][0];
+    })
+    .catch((err: any) => {
+      console.error(err);
+      toast.error(`Failure: ${err}`);
+    });
+};
+
+const issuerStore = useIssuerStore();
+const handleSubmit = async () => {
   try {
     await issuerStore.offerCredential(payload.value);
     toast.info('Transcript Sent');
   } catch (error) {
     toast.error(`Failure: ${error}`);
   } finally {
-    submitted.value = false;
     // Reset values
     transcriptLoading.value = false;
     transcriptContent.value = '';
-    isMetaData.value = true;
     payload.value = {};
-    // Clear dropdown and reset form fields
-    formFields.selectedConnection = undefined;
-    connectionsList.value = [];
     formFields.studentID = '';
   }
 };
 
-// Convert the key to title case and insert space before capital letters after lowercase letters
-const updateKey = (input: any) =>
-  input
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/^./, (str: string) => str.toUpperCase());
-
-watch(
-  () => formFields.selectedConnection,
-  () => {
-    if (formFields.selectedConnection) {
-      // Reset values
-      transcriptLoading.value = false;
-      transcriptContent.value = '';
-      isMetaData.value = true;
-      payload.value = {};
-      fetchMetadata(formFields.selectedConnection.value);
-    }
-  },
-  { deep: true }
-);
-
 onMounted(async () => {
-  connectionStore.listConnections().catch((err) => {
-    console.error(`Failure: ${err}`);
-  });
   credentialDefinitionId.value = (
     await sisApi.getHttp(`metadata/transcript-credential-definition-id`)
   ).data?.transcriptCredentialDefinitionId;
@@ -371,70 +301,107 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-.transcript-form {
-  max-width: 650px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.transcript-group .input-and-button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.transcript-group input {
-  width: 100%;
-}
-
-.form-group input {
-  width: 100%;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-}
-
-.button-submit {
-  margin-left: auto;
-}
-
-:deep(.transcriptContent .vjs-tree-node) {
-  line-height: 14px !important;
-}
-:deep(.transcriptContent .vjs-tree-node) {
-  font-size: 12px !important;
-}
-
-@media (max-width: 768px) {
-  .transcript-form {
-    max-width: 100%;
+<style lang="scss" scoped>
+.main-transcript {
+  background-color: #fff;
+  color: $tenant-ui-new-text-on-primary;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0px 4px 10px rgba(66, 66, 66, 0.1);
+  padding: 20px;
+  overflow: hidden;
+  .title {
+    font-size: 24px;
+    font-weight: 600;
   }
-  .form-group input,
-  .form-actions button {
-    width: 100%;
+  .description {
+    font-size: 16px;
+    font-weight: 400;
   }
-  .form-actions {
-    flex-direction: column;
-    align-items: stretch;
+  .icon-size {
+    width: 18px;
+    margin-top: -4px;
+    color: #424242;
   }
-  .button-submit {
-    margin-top: 10px;
+  form {
+    max-width: 650px;
+    input {
+      text-indent: 30px;
+      background-color: #ffffff;
+      border: 0;
+      height: 42px;
+      text-indent: 30px;
+      width: 100%;
+      box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2);
+      font-family: 'Open Sans';
+    }
+    .fullNameInputContent .p-input-icon {
+      opacity: 0.8;
+      z-index: 1;
+    }
+    .fullNameInput {
+      border: 1px solid #868686;
+      box-shadow: none;
+      opacity: 0.8;
+      &:hover,
+      &:focus {
+        border: 1px solid #868686 !important;
+      }
+    }
+    .button-id-lookup {
+      position: absolute;
+      top: 3px;
+      right: 0;
+      cursor: pointer;
+      background-color: #fff;
+      border: none;
+      color: #424242;
+      z-index: 999;
+      &:focus {
+        box-shadow: none !important ;
+      }
+    }
+    /* remove outline on focus - chrome */
+    .field .p-inputtext:focus {
+      box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2) !important;
+    }
+    button.button-submit,
+    button.button-submit:hover {
+      box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2);
+      background-color: #6666cc !important;
+      font-size: 16px;
+      border: none;
+      height: 42px;
+    }
   }
-  .button-submit {
-    margin-left: 0;
+  .transcript-img {
+    :deep(svg) {
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+    }
+    img {
+      margin-bottom: -55px;
+    }
   }
-  .transcript-group .input-and-button {
-    align-items: stretch;
+}
+
+.p-dialog {
+  button,
+  button:hover {
+    box-shadow: 0px 4px 4px 0px rgba(66, 66, 66, 0.2);
+    background-color: #6666cc !important;
+    font-size: 16px;
+    border: none;
+    height: 42px;
+  }
+}
+
+.taa-html {
+  :deep(svg) {
+    border: 1px dashed gray;
+    background-color: #eaeaea;
+    padding: 1em;
   }
 }
 </style>

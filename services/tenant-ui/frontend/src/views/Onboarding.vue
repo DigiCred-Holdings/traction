@@ -18,7 +18,7 @@
                 <InputIcon>
                   <svg-icon
                     type="mdi"
-                    :path="emailOutlineIcon"
+                    :path="mdiCardAccountDetailsOutline"
                     class="icon-size"
                   ></svg-icon>
                 </InputIcon>
@@ -74,7 +74,7 @@
                 <InputIcon>
                   <svg-icon
                     type="mdi"
-                    :path="emailOutlineIcon"
+                    :path="mdiCardBulletedOutline"
                     class="icon-size"
                   ></svg-icon>
                 </InputIcon>
@@ -194,11 +194,9 @@ import { useToast } from 'vue-toastification';
 import { storeToRefs } from 'pinia';
 import { useTenantStore } from '@/store';
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiEmailOutline } from '@mdi/js';
+import { mdiCardAccountDetailsOutline, mdiCardBulletedOutline } from '@mdi/js';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-
-const emailOutlineIcon = mdiEmailOutline;
 
 const { t } = useI18n();
 const studentId = ref('');
