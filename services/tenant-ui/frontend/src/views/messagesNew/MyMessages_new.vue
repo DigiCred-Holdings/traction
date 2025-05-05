@@ -72,8 +72,6 @@ const startBroadcast = async () => {
     broadcastStarted.value = false;
   } catch (error) {
     console.error('Error broadcasting message:', error);
-    
-    
     toast.error(t('messages.broadcastFailed'));
   }
 };
