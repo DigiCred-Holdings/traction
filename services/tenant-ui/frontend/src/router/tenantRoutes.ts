@@ -4,6 +4,7 @@ import About from '@/views/About.vue';
 import Onboarding from '@/views/Onboarding.vue';
 import Transcript from '@/views/transcript/Transcript.vue';
 import Workflows from '@/views/Workflows.vue';
+import { RouteRecordRaw } from 'vue-router';
 
 // Tenant
 import TenantUi from '@/views/TenantUi.vue';
@@ -35,7 +36,6 @@ import Log from '@/views/Log.vue';
 import { RESERVATION_STATUS_ROUTE } from '@/helpers/constants';
 // Tablet
 import OnboardingTablet from '@/views/OnboardingTablet.vue';
-import { RouteRecordRaw } from 'vue-router';
 // import i18n from '@/plugins/i18n/i18n';
 
 import MyMessages_new from '@/views/messagesNew/MyMessages_new.vue';
@@ -50,7 +50,7 @@ const tenantRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => Dashboard,
+        component: Dashboard,
         meta: { title: 'Dashboard' },
       },
 
