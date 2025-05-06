@@ -11,7 +11,7 @@ ENV PATH="/opt/poetry/bin:$PATH"
 RUN poetry config virtualenvs.in-project true
 
 # Setup project
-RUN mkdir traction_plugins && touch traction_plugins/__init__.py
+RUN mkdir -p traction_plugins && touch traction_plugins/__init__.py
 COPY --chown=aries:aries traction_innkeeper/pyproject.toml README.md ./
 
 # copy over our local plugins code so we can build/install them
@@ -34,7 +34,18 @@ COPY --from=base --chown=aries:aries /home/aries/.venv /home/aries/.venv
 ENV PATH="/home/aries/.venv/bin:$PATH"
 
 COPY --chown=aries:aries docker/default.yml ./
-COPY --chown=aries:aries traction_innkeeper/traction_innkeeper traction_plugins/traction_innkeeper
+
+# Setup proper package structure for traction_plugins
+RUN mkdir -p /home/aries/traction_plugins
+COPY --chown=aries:aries traction_innkeeper/traction_innkeeper /home/aries/traction_plugins/traction_innkeeper
+
+# Ensure proper Python package structure with __init__.py files
+RUN touch /home/aries/traction_plugins/__init__.py && \
+    touch /home/aries/traction_plugins/traction_innkeeper/__init__.py
+
+# Add traction_plugins to Python path
+ENV PYTHONPATH="/home/aries:${PYTHONPATH}"
+
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=basicmessage_storage
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=connection_update
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=multitenant_provider
