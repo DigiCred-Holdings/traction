@@ -1,8 +1,8 @@
-FROM --platform=$BUILDPLATFORM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2 AS base
+FROM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2 AS base
 
 # Install and Configure Poetry
 USER root
-ENV POETRY_VERSION=1.8.3
+ENV POETRY_VERSION=2.1.1
 ENV POETRY_HOME=/opt/poetry
 RUN apt-get update && apt-get install -y curl && apt-get clean
 RUN curl -sSL https://install.python-poetry.org | python - --version $POETRY_VERSION
@@ -12,7 +12,7 @@ RUN poetry config virtualenvs.in-project true
 
 # Setup project
 RUN mkdir traction_plugins && touch traction_plugins/__init__.py
-COPY --chown=aries:aries pyproject.toml README.md ./
+COPY --chown=aries:aries traction_innkeeper/pyproject.toml README.md ./
 
 # copy over our local plugins code so we can build/install them
 # these should come from github or some version, published location
@@ -29,7 +29,7 @@ RUN python -m venv /home/aries/.venv && \
 RUN ln -s /home/aries/.venv/lib/python3.12/site-packages site-packages
 
 
-FROM --platform=$BUILDPLATFORM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2
+FROM ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.2
 COPY --from=base --chown=aries:aries /home/aries/.venv /home/aries/.venv
 ENV PATH="/home/aries/.venv/bin:$PATH"
 
@@ -39,6 +39,7 @@ RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=connection_update
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=multitenant_provider
 RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=rpc
+RUN pip install git+https://github.com/openwallet-foundation/acapy-plugins@1.2.2#subdirectory=connections
 
 
 ENTRYPOINT ["/bin/bash", "-c", "aca-py \"$@\"", "--"]
