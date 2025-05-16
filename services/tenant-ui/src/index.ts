@@ -12,6 +12,7 @@ const API_ROOT: string = config.get("server.apiPath");
 const LOKI_URL: string = config.get("server.lokiUrl");
 const PORT: number = parseInt(config.get("server.port") as string, 10);
 const STATIC_FILES_PATH: string = config.get("server.staticFiles");
+const CORS_ALLOWED_ORIGINS: string = config.get("server.corsAllowedOrigins");
 
 import history from "connect-history-api-fallback";
 
@@ -38,7 +39,16 @@ app.use(
 );
 
 app.use(history());
-app.use(cors());
+
+// Configure CORS
+const corsOptions = {
+  origin:
+    CORS_ALLOWED_ORIGINS === "*"
+      ? "*"
+      : CORS_ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()),
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
