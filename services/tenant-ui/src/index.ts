@@ -1,6 +1,7 @@
 import config from "config";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import path from "path";
 
 import { router } from "./routes/router";
@@ -15,6 +16,23 @@ const STATIC_FILES_PATH: string = config.get("server.staticFiles");
 import history from "connect-history-api-fallback";
 
 const app = express();
+
+// Apply Helmet's default security headers
+app.use(helmet());
+
+// Apply a specific Content Security Policy
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      // It's likely need to adjust this later to allow resources from CDNs or other trusted domains that our application uses.
+      defaultSrc: ["'self'"], // Which means that the only sources of content are the same origin
+      // Add other directives here as needed, for example:
+      // scriptSrc: ["'self'", "trusted-cdn.com"],
+      // styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if necessary
+      // imgSrc: ["'self'", "data:"] // Allow data URIs for images
+    },
+  })
+);
 
 app.use(history());
 app.use(cors());
