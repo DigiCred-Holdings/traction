@@ -17,6 +17,9 @@ import history from "connect-history-api-fallback";
 
 const app = express();
 
+// Disable X-Powered-By header for security
+app.disable("x-powered-by");
+
 // Apply Helmet's default security headers
 app.use(helmet());
 
