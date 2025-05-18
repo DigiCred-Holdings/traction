@@ -57,6 +57,7 @@
     "staticFiles": "../../frontend/dist",
     "tractionUrl": "http://crms.digicred.services:5100",
     "lokiUrl": "ws://host.docker.internal:3100",
+    "corsAllowedOrigins": "*",
     "oidc": {
       "jwksUri": "https://dev.loginproxy.gov.bc.ca/auth/realms/digitaltrust-citz/protocol/openid-connect/certs",
       "realm": "digitaltrust-citz",
