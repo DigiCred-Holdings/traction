@@ -3,35 +3,45 @@
     v-model:expanded-rows="expandedRows"
     v-model:filters="filter"
     :loading="loading"
-    :value="workflows"
+    :value="enrollments"
     :paginator="true"
     :rows="TABLE_OPT.ROWS_DEFAULT"
     :rows-per-page-options="TABLE_OPT.ROWS_OPTIONS"
-    :global-filter-fields="['name']"
+    :global-filter-fields="['enrollment_id']"
     selection-mode="single"
-    data-key="workflowId"
-    sort-field="name"
+    data-key="enrollment_id"
+    sort-field="enrollment_id"
     :sort-order="-1"
     filter-display="menu"
   >
     <template #header>
       <div class="flex flex-wrap justify-content-between">
-        <span class="text-xl font-bold">{{ $t('workflow.list') }}</span>
-        <Button
-          :label="$t('workflow.add')"
-          icon="pi pi-plus"
-          class="btn-primary pi-button"
-          icon-pos="right"
-          @click="$emit('add', webHookUrl)"
-        />
+        <span class="text-xl font-bold">{{ $t('enrollment.list') }}</span>
       </div>
     </template>
     <template #empty>{{ $t('common.noRecordsFound') }}</template>
     <template #loading>{{ $t('common.loading') }}</template>
     <Column
       :sortable="true"
-      field="name"
-      :header="$t('common.name')"
+      field="enrollment_id"
+      :header="$t('enrollment.id')"
+      filter-field="ID"
+      :show-filter-match-modes="false"
+    >
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          class="p-column-filter"
+          placeholder="Search By ID"
+          @input="filterCallback()"
+        />
+      </template>
+    </Column>
+    <Column
+      :sortable="true"
+      field="student_full_name"
+      :header="$t('enrollment.fullName')"
       filter-field="name"
       :show-filter-match-modes="false"
     >
@@ -47,47 +57,61 @@
     </Column>
     <Column
       :sortable="true"
-      field="createdAt"
-      :header="$t('common.createdAt')"
-      filter-field="createdAt"
+      field="school_name"
+      :header="$t('enrollment.schoolName')"
+      filter-field="name"
       :show-filter-match-modes="false"
     >
-    </Column>
-    <!-- <Column
-        :sortable="true"
-        field="status"
-        :header="$t('common.status')"
-        filter-field="status"
-        :show-filter-match-modes="false"
-      >
-      <template #body="{ data }">
-        <span :class="data.status === 'Active' ? 'badge-active' : 'badge-inactive'">{{ data.status ? data.status : "Inactive" }}</span>
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          class="p-column-filter"
+          placeholder="Search By Name"
+          @input="filterCallback()"
+        />
       </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            class="p-column-filter"
-            placeholder="Search By Status"
-            @input="filterCallback()"
-          />
-        </template>
-      </Column> -->
+    </Column>
+    <Column
+      :sortable="true"
+      field="enrollment_status"
+      :header="$t('common.status')"
+      filter-field="status"
+      :show-filter-match-modes="false"
+    >
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          class="p-column-filter"
+          placeholder="Search By Status"
+          @input="filterCallback()"
+        />
+      </template>
+    </Column>
     <Column :sortable="false" :header="$t('common.actions')">
       <template #body="{ data }">
         <Button
-          icon="pi pi-pencil"
+          icon="pi pi-angle-right"
           rounded
           :szie="large"
           class="p-button-text"
-          @click="$emit('edit', data, webHookUrl)"
+          @click="handleDialog(data)"
         />
       </template>
     </Column>
   </DataTable>
+  <Dialog
+    v-model:visible="showDialog"
+    modal
+    :style="{ width: '50vw' }"
+    :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+  >
+    <EnrollmentForm :enrollment="selectedEnrollment" />
+  </Dialog>
 </template>
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'vue-toastification';
 import { useTenantStore } from '@/store';
@@ -97,13 +121,12 @@ import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
-import { webhookService } from '@/services/webhookService';
+import Dialog from 'primevue/dialog';
+import EnrollmentForm from './EnrollmentForm.vue';
 
-const workflows = ref([]);
 const toast = useToast();
 
-defineEmits(['edit', 'add']);
-
+const enrollments = ref(null);
 const { tenantWallet } = storeToRefs(useTenantStore());
 const tenantStore = useTenantStore();
 const webhookUrl = ref(null);
@@ -132,10 +155,11 @@ const loadTenantSettings = async () => {
   }
 };
 
-const fetchWorkflows = async () => {
+const fetchEnrollements = async () => {
   try {
     if (webhookUrl.value) {
-      const url = `${webhookUrl.value}/workflow/get-workflows`;
+      const url = `${webhookUrl.value}/enrollment`;
+      console.log('webhookUrl: ' + webhookUrl.value);
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -146,18 +170,17 @@ const fetchWorkflows = async () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      workflows.value = await response.json();
-      console.log(response);
+      enrollments.value = await response.json();
+      console.log('enrollment: ' + enrollments.value);
     }
   } catch (error) {
-    console.error('Error fetching workflows:', error);
-    workflows.value = [];
+    console.error('Error fetching enrollments:', error);
   }
 };
 
 onMounted(async () => {
   await loadTenantSettings();
-  await fetchWorkflows();
+  await fetchEnrollements();
 });
 
 const filter = ref({
@@ -174,6 +197,15 @@ const filter = ref({
     matchMode: FilterMatchMode.CONTAINS,
   },
 });
+
+//Dialog
+
+const showDialog = ref(false);
+const selectedEnrollment = ref(null);
+const handleDialog = async (enrollment) => {
+  selectedEnrollment.value = enrollment;
+  showDialog.value = true;
+};
 </script>
 
 <style scoped lang="scss">
