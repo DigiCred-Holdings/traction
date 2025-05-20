@@ -5,6 +5,7 @@ import Onboarding from '@/views/Onboarding.vue';
 import Transcript from '@/views/transcript/Transcript.vue';
 import Workflows from '@/views/Workflows.vue';
 import { RouteRecordRaw } from 'vue-router';
+import Enrollment from '@/views/Enrollment.vue';
 
 // Tenant
 import TenantUi from '@/views/TenantUi.vue';
@@ -66,7 +67,14 @@ const tenantRoutes: RouteRecordRaw[] = [
         name: 'Workflows',
         component: Workflows,
       },
+      //Enrollment
+      {
+        path: '/enrollment',
+        name: 'Enrollment',
+        component: Enrollment,
+      },
       // Transcript
+      // About
       {
         path: '/transcript',
         name: 'transcript',

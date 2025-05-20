@@ -82,6 +82,11 @@ const sidebarItems = [
     route: '/issuance/credentials',
   },
   {
+    label: t('enrollment.enrollment'),
+    icon: 'pi pi-fw pi-address-book',
+    route: '/enrollment',
+  },
+  {
     label: t('verify.verification'),
     icon: 'pi pi-fw pi-check-square',
     route: '/verification/verifications',

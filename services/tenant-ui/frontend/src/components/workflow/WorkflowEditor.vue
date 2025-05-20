@@ -329,7 +329,7 @@ watch(
   border: none;
   margin: 0 5px;
 }
-button{
+button {
   background-color: $tenant-ui-new-accent-color;
 }
 .title {
