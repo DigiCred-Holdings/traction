@@ -22,7 +22,7 @@
           icon="pi pi-plus"
           class="btn-primary pi-button"
           icon-pos="right"
-          @click="$emit('add', webHookUrl)"
+          @click="$emit('add', webhookUrl)"
         />
       </div>
     </template>
@@ -80,7 +80,7 @@
           rounded
           :szie="large"
           class="p-button-text"
-          @click="$emit('edit', data, webHookUrl)"
+          @click="$emit('edit', data, webhookUrl)"
         />
       </template>
     </Column>
