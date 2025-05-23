@@ -33,6 +33,8 @@
     "list": "Enrollments",
     "information": "Enrollment Information",
     "studentInformation": "Student Information",
+    "studentNumber": "Student Number",
+    "studentName": "Student Name",
     "id": "ID",
     "name": "Name:",
     "dateOfBirth": "DOB:",
@@ -46,6 +48,7 @@
       "denied": "Denied"
     },
     "schoolInfo": "School Information",
+    "schoolName": "School Name",
     "graduationYear": "Graduation:",
     "gpa": "GPA:",
     "terms": "Terms",

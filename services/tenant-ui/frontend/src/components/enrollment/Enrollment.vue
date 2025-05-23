@@ -23,9 +23,8 @@
     <template #loading>{{ $t('common.loading') }}</template>
     <Column
       :sortable="true"
-      field="enrollment_id"
-      :header="$t('enrollment.id')"
-      filter-field="ID"
+      field="student_number"
+      :header="$t('enrollment.studentNumber')"
       :show-filter-match-modes="false"
     >
       <template #filter="{ filterModel, filterCallback }">
@@ -41,7 +40,7 @@
     <Column
       :sortable="true"
       field="student_full_name"
-      :header="$t('enrollment.fullName')"
+      :header="$t('enrollment.studentName')"
       filter-field="name"
       :show-filter-match-modes="false"
     >
@@ -89,6 +88,26 @@
         />
       </template>
     </Column>
+    <Column
+      :sortable="true"
+      field="created_at"
+      :header="$t('common.createdAt')"
+      filter-field="created_at"
+      :show-filter-match-modes="false"
+    >
+      <template #body="{ data }">
+        {{ formatDate(data.created_at)}}
+      </template>
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          class="p-column-filter"
+          :placeholder="$t('common.searchByCreated')"
+          @input="filterCallback()"
+        />
+      </template>
+    </Column>
     <Column :sortable="false" :header="$t('common.actions')">
       <template #body="{ data }">
         <Button
@@ -97,6 +116,14 @@
           :szie="large"
           class="p-button-text"
           @click="handleDialog(data)"
+        />
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          rounded
+          :szie="large"
+          class="p-button-text"
+          @click="handleDelete(data)"
         />
       </template>
     </Column>
@@ -114,6 +141,7 @@
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'vue-toastification';
+import { useI18n } from 'vue-i18n';
 import { useTenantStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { TABLE_OPT } from '@/helpers/constants';
@@ -125,13 +153,16 @@ import Dialog from 'primevue/dialog';
 import EnrollmentForm from './EnrollmentForm.vue';
 
 const toast = useToast();
-
+const { t } = useI18n();
 const enrollments = ref(null);
 const { tenantWallet } = storeToRefs(useTenantStore());
 const tenantStore = useTenantStore();
 const webhookUrl = ref(null);
 const webhookKey = ref(null);
-
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  return new Date(date).toLocaleDateString('en-US', options);
+};
 const loadTenantSettings = async () => {
   try {
     await tenantStore.getTenantSubWallet();
@@ -205,6 +236,34 @@ const selectedEnrollment = ref(null);
 const handleDialog = async (enrollment) => {
   selectedEnrollment.value = enrollment;
   showDialog.value = true;
+};
+const handleDelete = async (enrollment) => {
+  const confirmed = confirm(
+    `Are you sure you want to delete the enrollment for ${enrollment.student_full_name}?`
+  );
+  if (confirmed) {
+    try {
+      if (webhookUrl.value) {
+        const url = `${webhookUrl.value}/enrollment/${enrollment.enrollment_id}`;
+        console.log('url: ' + url);
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': webhookKey.value,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        toast.success(
+          `Enrollment for ${enrollment.student_full_name} deleted successfully`
+        );
+      }
+    } catch (error) {
+      console.error('Error fetching enrollments:', error);
+    }
+  }
 };
 </script>
 

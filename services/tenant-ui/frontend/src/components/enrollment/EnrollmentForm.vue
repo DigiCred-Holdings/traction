@@ -4,7 +4,7 @@
 
     <section class="mb-4">
       <h2 class="text-xl font-semibold mb-2">
-        {{ $t(enrollment.studentInformation) }}
+        {{ $t('enrollment.studentInformation') }}
       </h2>
       <p>
         <strong>{{ $t('enrollment.name') }}</strong>
@@ -125,8 +125,10 @@
 
 <script setup>
 import { ref, defineProps } from 'vue';
+import { useI18n } from 'vue-i18n';
 import jsPDF from 'jspdf';
 
+const { t } = useI18n();
 const props = defineProps({
   enrollment: {
     type: Object,
