@@ -4,7 +4,13 @@
       <Card
         title="Student IDs Issued"
         :value="
-          String(summary.find((item) => item.kind === 'Credential')?.count || 0)
+          String(summary.find((item) => item.kind === 'StudentID')?.count || 0)
+        "
+      />
+      <Card
+        title="Transcripts Issued"
+        :value="
+          String(summary.find((item) => item.kind === 'Transcript')?.count || 0)
         "
       />
       <Card
@@ -34,7 +40,9 @@
         :invited="
           Number(summary.find((item) => item.kind === 'Invited')?.count || 0)
         "
-        :failed="0"
+        :failed="
+          Number(summary.find((item) => item.kind === 'Failed')?.count || 0)
+        "
       />
     </div>
     <button
@@ -59,7 +67,7 @@ import Tooltip from 'primevue/tooltip';
 
 interface SummaryItem {
   kind:
-    | 'Credential'
+    | 'StudentID'
     | 'Transcript'
     | 'Message'
     | 'Connection'
@@ -116,12 +124,20 @@ const fetchSummaryData = async (forceRefresh: boolean = false) => {
     console.log('Dashboard: Summary data received:', summary.value);
 
     // Update API status with credential count
-    const credentialItem = summary.value.find(
-      (item) => item.kind === 'Credential'
+    const studentIdItem = summary.value.find(
+      (item) => item.kind === 'StudentID'
     );
-    console.log('Dashboard: Credential item:', credentialItem);
-    if (credentialItem) {
-      apiStatus.value = `Found ${credentialItem.count} Credentials, ${totalItems.value} total items`;
+    const transcriptItem = summary.value.find(
+      (item) => item.kind === 'Transcript'
+    );
+    console.log('Dashboard: StudentID item:', studentIdItem);
+    console.log('Dashboard: Transcript item:', transcriptItem);
+    
+    const studentIdCount = studentIdItem?.count || 0;
+    const transcriptCount = transcriptItem?.count || 0;
+    
+    if (studentIdCount > 0 || transcriptCount > 0) {
+      apiStatus.value = `Found ${studentIdCount} Student IDs, ${transcriptCount} Transcripts, ${totalItems.value} total items`;
     } else {
       apiStatus.value = `Found ${totalItems.value} total items`;
     }

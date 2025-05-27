@@ -151,11 +151,11 @@ router.get(
           console.log("Router: No cached data available, returning empty summary data");
           const defaultSummary = [
             { kind: "Connection", kind_id: 1, count: 0, source: 'acapy' },
-            { kind: "Credential", kind_id: 2, count: 0, source: 'acapy' },
-            { kind: "Invited", kind_id: 3, count: 0, source: 'acapy' },
-            { kind: "Message", kind_id: 4, count: 0, source: 'acapy' },
-            { kind: "Transcript", kind_id: 5, count: 0, source: 'acapy' },
-            { kind: "Failed", kind_id: 6, count: 0, source: 'acapy' }
+            { kind: "StudentID", kind_id: 2, count: 0, source: 'acapy' },
+            { kind: "Transcript", kind_id: 3, count: 0, source: 'acapy' },
+            { kind: "Invited", kind_id: 4, count: 0, source: 'acapy' },
+            { kind: "Failed", kind_id: 5, count: 0, source: 'acapy' },
+            { kind: "Message", kind_id: 6, count: 0, source: 'acapy' }
           ];
           res.status(200).json(defaultSummary);
         }

@@ -20,9 +20,9 @@ const pool = new Pool(dbConfig);
 
 export enum ItemKind {
   Connection = "Connection",
-  Credential = "Credential",
+  StudentID = "StudentID",
+  Transcript = "Transcript", 
   Message = "Message",
-  Transcript = "Transcript",
   Invited = "Invited",
   Failed = "Failed"
 }
@@ -91,9 +91,13 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     }
 
     let credentialCount = 0;
+    let studentIdCount = 0;
+    let transcriptCount = 0;
     let credentialDetails = {
       legacy: [] as any[],
-      w3c: [] as any[]
+      w3c: [] as any[],
+      studentId: [] as any[],
+      transcript: [] as any[]
     };
 
     try {
@@ -102,7 +106,25 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       if (credentialsResponse) {
         credentialCount = credentialsResponse.total || 0;
         credentialDetails.legacy = credentialsResponse.credentials || [];
-        console.log(`AcaPy API returned ${credentialCount} credentials (${credentialDetails.legacy.length} legacy, ${credentialDetails.w3c.length} W3C)`);
+        
+        // Categorize credentials by credential definition name
+        for (const credential of credentialDetails.legacy) {
+          if (credential.cred_def_id) {
+            // Extract tag from credential definition ID (last part after final colon)
+            const credDefIdParts = credential.cred_def_id.split(':');
+            const credDefTag = credDefIdParts[credDefIdParts.length - 1] || '';
+            
+            if (credDefTag.toUpperCase().includes('ID') || credDefTag.toUpperCase().includes('CARD')) {
+              credentialDetails.studentId.push(credential);
+              studentIdCount++;
+            } else if (credDefTag.toUpperCase().includes('TRANSCRIPT')) {
+              credentialDetails.transcript.push(credential);
+              transcriptCount++;
+            }
+          }
+        }
+        
+        console.log(`AcaPy API returned ${credentialCount} credentials (${studentIdCount} Student IDs, ${transcriptCount} Transcripts)`);
         
         await redisService.redisClient.set('credentials:all', JSON.stringify(credentialDetails), {
           EX: redisConfig.ttl
@@ -113,6 +135,8 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
         const cachedCredentials = await redisService.redisClient.get('credentials:all');
         if (cachedCredentials) {
           credentialDetails = JSON.parse(cachedCredentials);
+          studentIdCount = credentialDetails.studentId?.length || 0;
+          transcriptCount = credentialDetails.transcript?.length || 0;
           credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
           console.log(`Using cached credentials from Redis`);
         }
@@ -123,6 +147,8 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
       if (cachedCredentials) {
         credentialDetails = JSON.parse(cachedCredentials);
+        studentIdCount = credentialDetails.studentId?.length || 0;
+        transcriptCount = credentialDetails.transcript?.length || 0;
         credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
         console.log(`Using cached credentials from Redis after API error`);
       }
@@ -142,9 +168,16 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     });
 
     formattedResults.push({
-      kind: ItemKind.Credential,
+      kind: ItemKind.StudentID,
       kind_id: 2,
-      count: credentialCount,
+      count: studentIdCount,
+      source: 'acapy',
+    });
+
+    formattedResults.push({
+      kind: ItemKind.Transcript,
+      kind_id: 3,
+      count: transcriptCount,
       source: 'acapy',
     });
 
@@ -157,7 +190,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
 
     formattedResults.push({
       kind: ItemKind.Invited,
-      kind_id: 3,
+      kind_id: 4,
       count: invitedConnections.length,
       source: 'acapy',
     });
@@ -170,21 +203,14 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
 
     formattedResults.push({
       kind: ItemKind.Failed,
-      kind_id: 6,
+      kind_id: 5,
       count: failedConnections.length,
       source: 'acapy',
     });
 
     formattedResults.push({
       kind: ItemKind.Message,
-      kind_id: 4,
-      count: 0,
-      source: 'acapy',
-    });
-
-    formattedResults.push({
-      kind: ItemKind.Transcript,
-      kind_id: 5,
+      kind_id: 6,
       count: 0,
       source: 'acapy',
     });
