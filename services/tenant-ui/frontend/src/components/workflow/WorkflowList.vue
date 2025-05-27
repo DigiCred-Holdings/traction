@@ -22,7 +22,7 @@
           icon="pi pi-plus"
           class="btn-primary pi-button"
           icon-pos="right"
-          @click="$emit('add', webHookUrl)"
+          @click="$emit('add', webhookUrl)"
         />
       </div>
     </template>
@@ -80,7 +80,7 @@
           rounded
           :szie="large"
           class="p-button-text"
-          @click="$emit('edit', data, webHookUrl)"
+          @click="$emit('edit', data, webhookUrl)"
         />
       </template>
     </Column>
@@ -106,15 +106,22 @@ defineEmits(['edit', 'add']);
 
 const { tenantWallet } = storeToRefs(useTenantStore());
 const tenantStore = useTenantStore();
-const webHookUrl = ref(null);
+const webhookUrl = ref(null);
+const webhookKey = ref(null);
 
 const loadTenantSettings = async () => {
   try {
     await tenantStore.getTenantSubWallet();
-    const webhookUrls = tenantWallet.value?.settings?.['wallet.webhook_urls'];
-    console.log('webhookUrls', webhookUrls);
-    if (webhookUrls && webhookUrls.length > 0) {
-      webHookUrl.value = webhookUrls[0];
+    const webhooks = tenantWallet.value?.settings?.['wallet.webhook_urls'][0];
+    console.log('webhooks', webhooks);
+    if (webhooks.length > 0) {
+      if (webhooks.match(/#/g)) {
+        webhookUrl.value = webhooks.substring(0, webhooks.indexOf('#'));
+        webhookKey.value = webhooks.substring(webhooks.indexOf('#') + 1);
+      } else {
+        webhookUrl.value = webhooks;
+        webhookKey.value = '';
+      }
     } else {
       console.error('No webhook URLs found in tenant settings');
       toast.error('No webhook URLs found in tenant settings');
@@ -127,9 +134,20 @@ const loadTenantSettings = async () => {
 
 const fetchWorkflows = async () => {
   try {
-    if (webHookUrl.value) {
-      workflows.value = await webhookService.getWorkflows(webHookUrl.value);
-      console.log(workflows.value);
+    if (webhookUrl.value) {
+      const url = `${webhookUrl.value}/workflow/get-workflows`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': webhookKey.value,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      workflows.value = await response.json();
+      console.log(response);
     }
   } catch (error) {
     console.error('Error fetching workflows:', error);

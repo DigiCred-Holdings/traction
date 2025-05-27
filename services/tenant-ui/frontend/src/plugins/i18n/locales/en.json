@@ -28,6 +28,52 @@
     "create": "Create Workflow",
     "edit": "Edit Workflow"
   },
+  "enrollment":{
+    "enrollment": "Enrollment",
+    "list": "Enrollments",
+    "information": "Enrollment Information",
+    "studentInformation": "Student Information",
+    "studentNumber": "Student Number",
+    "studentName": "Student Name",
+    "id": "ID",
+    "name": "Name:",
+    "dateOfBirth": "DOB:",
+    "address":"Address:",
+    "phone":"Phone:",
+    "email":"Email:",
+    "enrollmentStatus":"Enrollment Status",
+    "enrollmentStatusOptions": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "denied": "Denied"
+    },
+    "schoolInfo": "School Information",
+    "schoolName": "School Name",
+    "graduationYear": "Graduation:",
+    "gpa": "GPA:",
+    "terms": "Terms",
+    "year": "Year:",
+    "gradeLevel": "Grade Level:",
+    "grade": "Grade:",
+    "credits": "Credits:",
+    "courses": "Courses",
+    "courseTitle": "Course Title:",
+    "courseCode": "Course Code:",
+    "courseGrade": "Course Grade:",
+    "creditEarned": "Credit Earned",
+    "transcript": "Transcript",
+    "program": "Program:",
+    "classRank": "Class Rank:",
+    "weightedGPA": "Weighted GPA:",
+    "unweightedGPA": "Unweighted GPA:",
+    "transcriptDate": "Transcript Date:",
+    "transcriptComments": "Transcript Comments:",
+    "download":"Download Transcript",
+    "downloadTranscriptOptions": {
+      "pdf": ".pdf",
+      "tiff": ".tiff"
+    }
+  },
   "bulkIssue": {
     "bulkIssue": "Bulk Issue",
     "totalConnections": "Total Connections: {count}",
@@ -155,7 +201,10 @@
     "tenantReason": "Tenant Reason",
     "toggleCardExpand": "Toggle Expanded",
     "walletId": "Wallet ID",
-    "warning": "Warning"
+    "warning": "Warning",
+    "hypen": " - ",
+    "comma": ", ",
+    "colon": ":"
   },
   "configuration": {
     "configuration": "Configuration",
