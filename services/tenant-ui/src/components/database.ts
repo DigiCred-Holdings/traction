@@ -55,7 +55,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     let connectionDetails = [];
     try {
       const connectionsResponse = await acaPyService.getConnections();
-
+      console.log("connectionsResponse", connectionsResponse);
       if (connectionsResponse && connectionsResponse.results) {
         connectionCount = connectionsResponse.results.length;
         connectionDetails = connectionsResponse.results.map((conn: any) => ({
@@ -101,25 +101,31 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     };
 
     try {
-      const credentialsResponse = await acaPyService.getAllCredentials();
-
+      const credentialsResponse = await acaPyService.getAllIssuedCredentials();
+      console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
       if (credentialsResponse) {
-        credentialCount = credentialsResponse.total || 0;
-        credentialDetails.legacy = credentialsResponse.credentials || [];
+        const v1Records = credentialsResponse.v1 || [];
+        const v2Records = credentialsResponse.v2 || [];
+        credentialCount = v1Records.length + v2Records.length;
+
+        const allRecords = [...v1Records, ...v2Records];
         
-        // Categorize credentials by credential definition name
-        for (const credential of credentialDetails.legacy) {
-          if (credential.cred_def_id) {
-            // Extract tag from credential definition ID (last part after final colon)
-            const credDefIdParts = credential.cred_def_id.split(':');
-            const credDefTag = credDefIdParts[credDefIdParts.length - 1] || '';
+        for (const record of allRecords) {
+          const credExRecord = record.cred_ex_record;
+          if (credExRecord && credExRecord.state === 'done') {
+            const credDefId = credExRecord.by_format?.cred_proposal?.indy?.cred_def_id ||
+                            credExRecord.by_format?.cred_offer?.indy?.cred_def_id;
             
-            if (credDefTag.toUpperCase().includes('ID') || credDefTag.toUpperCase().includes('CARD')) {
-              credentialDetails.studentId.push(credential);
-              studentIdCount++;
-            } else if (credDefTag.toUpperCase().includes('TRANSCRIPT')) {
-              credentialDetails.transcript.push(credential);
-              transcriptCount++;
+            if (credDefId) {
+              const credDefTag = credDefId.split(':').pop()?.toUpperCase() || '';
+              
+              if (credDefTag.includes('STUDENT') && credDefTag.includes('CARD')) {
+                credentialDetails.studentId.push(record);
+                studentIdCount++;
+              } else if (credDefTag.includes('TRANSCRIPT')) {
+                credentialDetails.transcript.push(record);
+                transcriptCount++;
+              }
             }
           }
         }
@@ -137,7 +143,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
           credentialDetails = JSON.parse(cachedCredentials);
           studentIdCount = credentialDetails.studentId?.length || 0;
           transcriptCount = credentialDetails.transcript?.length || 0;
-          credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
+          credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
           console.log(`Using cached credentials from Redis`);
         }
       }
@@ -149,7 +155,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
         credentialDetails = JSON.parse(cachedCredentials);
         studentIdCount = credentialDetails.studentId?.length || 0;
         transcriptCount = credentialDetails.transcript?.length || 0;
-        credentialCount = credentialDetails.legacy.length + credentialDetails.w3c.length;
+        credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
         console.log(`Using cached credentials from Redis after API error`);
       }
     }
