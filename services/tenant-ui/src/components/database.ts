@@ -55,7 +55,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     let connectionDetails = [];
     try {
       const connectionsResponse = await acaPyService.getConnections();
-
+      console.log("connectionsResponse", connectionsResponse);
       if (connectionsResponse && connectionsResponse.results) {
         connectionCount = connectionsResponse.results.length;
         connectionDetails = connectionsResponse.results.map((conn: any) => ({
