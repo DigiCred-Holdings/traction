@@ -101,7 +101,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     };
 
     try {
-      const credentialsResponse = await acaPyService.getAllCredentials();
+      const credentialsResponse = await acaPyService.getAllIssuedCredentials();
       console.log("credentialsResponse", credentialsResponse);
       if (credentialsResponse) {
         credentialCount = credentialsResponse.total || 0;
