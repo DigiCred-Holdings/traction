@@ -55,7 +55,6 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     let connectionDetails = [];
     try {
       const connectionsResponse = await acaPyService.getConnections();
-      console.log("connectionsResponse", connectionsResponse);
       if (connectionsResponse && connectionsResponse.results) {
         connectionCount = connectionsResponse.results.length;
         connectionDetails = connectionsResponse.results.map((conn: any) => ({
@@ -102,7 +101,6 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
 
     try {
       const credentialsResponse = await acaPyService.getAllIssuedCredentials();
-      console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
       if (credentialsResponse) {
         const v1Records = credentialsResponse.v1 || [];
         const v2Records = credentialsResponse.v2 || [];
