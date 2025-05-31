@@ -239,17 +239,9 @@ const { t } = useI18n();
           }
 
           .credential-item {
-            background: var(--surface-ground);
-            border: 1px solid var(--surface-border);
-            border-radius: 6px;
             padding: 1rem;
             text-align: center;
             transition: all 0.2s ease;
-
-            &:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
 
             .credential-tag {
               font-size: 0.875rem;
