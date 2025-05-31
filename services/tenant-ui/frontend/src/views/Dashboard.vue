@@ -31,8 +31,6 @@
         :failed="
           Number(summary.find((item) => item.kind === 'Failed')?.count || 0)
         "
-        :student-ids="0"
-        :transcripts="0"
       />
     </div>
 

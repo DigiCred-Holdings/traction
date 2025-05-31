@@ -36,15 +36,7 @@ const props = defineProps({
   failed: {
     type: Number,
     required: true,
-  },
-  studentIds: {
-    type: Number,
-    required: true,
-  },
-  transcripts: {
-    type: Number,
-    required: true,
-  },
+  }
 });
 
 const chartRef = ref<HTMLElement | null>(null);
