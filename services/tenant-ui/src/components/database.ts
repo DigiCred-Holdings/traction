@@ -181,6 +181,8 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
         }
       }
     } catch (error: any) {
+      console.warn(`Could not fetch credentials from ACA-Py API: ${error.message}`);
+
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
       const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
       if (cachedCredentials) {
