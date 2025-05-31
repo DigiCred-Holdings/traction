@@ -31,7 +31,7 @@
         :failed="
           Number(summary.find((item) => item.kind === 'Failed')?.count || 0)
         "
-        :studentIds="0"
+        :student-ids="0"
         :transcripts="0"
       />
     </div>
@@ -39,11 +39,11 @@
     <div class="col-12 credentials-panel mt-4">
       <div class="p-card">
         <div class="p-card-header">
-          <h3>Issued Credentials by Type</h3>
+          <h3>{{ t('dashboard.issuedCredentialsByType') }}</h3>
         </div>
         <div class="p-card-body">
           <div v-if="Object.keys(credentialsSummary).length === 0" class="no-credentials">
-            <p>No credentials issued yet</p>
+            <p>{{ t('dashboard.noCredentialsIssuedYet') }}</p>
           </div>
           <div v-else class="credentials-grid">
             <div 
@@ -62,7 +62,7 @@
     <button
       class="p-button p-button-sm p-button-rounded p-button-text absolute bottom-0 right-0 mb-3 mr-3"
       style="z-index: 10"
-      v-tooltip.left="'Refresh Data'"
+      v-tooltip.left="t('dashboard.refreshData')"
       @click="fetchSummaryData(true)"
     >
       <i class="pi pi-refresh"></i>
@@ -78,6 +78,7 @@ import { useTenantStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { useTokenStore } from '@/store';
 import Tooltip from 'primevue/tooltip';
+import { useI18n } from 'vue-i18n';
 
 interface SummaryItem {
   kind:
@@ -174,6 +175,8 @@ const fetchSummaryData = async (forceRefresh: boolean = false) => {
     apiStatus.value = `Error fetching summary: ${errorMessage}`;
   }
 };
+
+const { t } = useI18n();
 </script>
 <style lang="scss">
 .main-dashboard {
