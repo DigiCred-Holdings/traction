@@ -109,91 +109,71 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       transcript: [] as any[]
     };
 
-    const isFinished = (state?: string): boolean =>
+    const isFinished = (state?: string) =>
       state === 'done' || state === 'credential_acked';
     
-    const getCredDefId = (ex: any): string | undefined => {
-      if (!ex) return undefined;
-      const v2 =
-        ex.by_format?.cred_proposal?.indy?.cred_def_id ??
-        ex.by_format?.cred_offer?.indy?.cred_def_id ??
-        ex.by_format?.cred_request?.indy?.cred_def_id ??
-        ex.by_format?.cred_issue?.indy?.cred_def_id;
-      if (v2) return v2;
-      return (
-        ex.credential_definition_id ||
-        ex.credential_offer?.cred_def_id ||
-        ex.credential?.cred_def_id
-      );
-    };
+    const getCredDefId = (ex: any) =>
+      ex?.by_format?.cred_proposal?.indy?.cred_def_id ??
+      ex?.by_format?.cred_offer?.indy?.cred_def_id ??
+      ex?.by_format?.cred_request?.indy?.cred_def_id ??
+      ex?.by_format?.cred_issue?.indy?.cred_def_id ??
+      ex?.credential_definition_id ??
+      ex?.credential_offer?.cred_def_id ??
+      ex?.credential?.cred_def_id;
     
     try {
       const credentialsResponse = await acaPyService.getAllIssuedCredentials();
-      if (credentialsResponse) {
-        const v1Records = credentialsResponse.v1 || [];
-        const v2Records = credentialsResponse.v2 || [];
-        credentialCount = v1Records.length + v2Records.length;
-        const allRecords = [...v1Records, ...v2Records];
-        for (const wrapper of allRecords) {
-          const credExRecord = wrapper.cred_ex_record ?? wrapper;
-          if (!isFinished(credExRecord?.state)) continue;
-          const credDefId = getCredDefId(credExRecord);
-          if (!credDefId) continue;
-          const credDefTag = credDefId.split(':').pop() || 'Unknown';
-          if (!credDefSummary[credDefTag]) {
-            credDefSummary[credDefTag] = {
-              credDefId,
-              tag: credDefTag,
-              count: 0,
-              records: []
-            };
-          }
-          credDefSummary[credDefTag].count++;
-          credDefSummary[credDefTag].records.push(wrapper);
-          const tagUpper = credDefTag.toUpperCase();
-          if (tagUpper.includes('STUDENT') && tagUpper.includes('CARD')) {
-            credentialDetails.studentId.push(wrapper);
-          } else if (tagUpper.includes('TRANSCRIPT')) {
-            credentialDetails.transcript.push(wrapper);
-          }
+      const v1Records = credentialsResponse.v1 ?? [];
+      const v2Records = credentialsResponse.v2 ?? [];
+      credentialCount = v1Records.length + v2Records.length;
+    
+      const allRecords: any[] = [...v1Records, ...v2Records]
+        .map((r) => r.cred_ex_record ?? r);
+    
+      for (const ex of allRecords) {
+        if (!isFinished(ex.state)) continue;
+        const credDefId = getCredDefId(ex);
+        if (!credDefId) continue;
+    
+        const tag = credDefId.split(':').pop() || 'Unknown';
+        if (!credDefSummary[tag]) {
+          credDefSummary[tag] = { credDefId, tag, count: 0, records: [] };
         }
-        await redisService.redisClient.set(
-          'credentials:all',
-          JSON.stringify(credentialDetails),
-          { EX: redisConfig.ttl }
-        );
-        await redisService.redisClient.set(
-          'credentials:by_cred_def',
-          JSON.stringify(credDefSummary),
-          { EX: redisConfig.ttl }
-        );
-      } else {
-        const cachedCredentials = await redisService.redisClient.get('credentials:all');
-        const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
-        if (cachedCredentials) {
-          credentialDetails = JSON.parse(cachedCredentials);
-          credentialCount =
-            (credentialDetails.legacy?.length || 0) +
-            (credentialDetails.w3c?.length || 0);
-        }
-        if (cachedCredDefSummary) {
-          Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
+        credDefSummary[tag].count++;
+        credDefSummary[tag].records.push(ex);
+    
+        const upper = tag.toUpperCase();
+        if (upper.includes('STUDENT') && upper.includes('CARD')) {
+          credentialDetails.studentId.push(ex);
+        } else if (upper.includes('TRANSCRIPT')) {
+          credentialDetails.transcript.push(ex);
         }
       }
+    
+      await redisService.redisClient.set(
+        'credentials:all',
+        JSON.stringify(credentialDetails),
+        { EX: redisConfig.ttl }
+      );
+      await redisService.redisClient.set(
+        'credentials:by_cred_def',
+        JSON.stringify(credDefSummary),
+        { EX: redisConfig.ttl }
+      );
     } catch (error: any) {
-      console.warn(`Could not fetch credentials from ACA-Py API: ${error.message}`);
-
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
       const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
       if (cachedCredentials) {
         credentialDetails = JSON.parse(cachedCredentials);
         credentialCount =
-          (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
+          (credentialDetails.legacy?.length || 0) +
+          (credentialDetails.w3c?.length || 0);
       }
       if (cachedCredDefSummary) {
         Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
       }
     }
+    
     
 
     const filteredConnections = connectionDetails.filter((conn: any) => conn.state === 'active');
