@@ -109,94 +109,90 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       transcript: [] as any[]
     };
 
+    const isFinished = (state?: string): boolean =>
+      state === 'done' || state === 'credential_acked';
+    
+    const getCredDefId = (ex: any): string | undefined => {
+      if (!ex) return undefined;
+      const v2 =
+        ex.by_format?.cred_proposal?.indy?.cred_def_id ??
+        ex.by_format?.cred_offer?.indy?.cred_def_id ??
+        ex.by_format?.cred_request?.indy?.cred_def_id ??
+        ex.by_format?.cred_issue?.indy?.cred_def_id;
+      if (v2) return v2;
+      return (
+        ex.credential_definition_id ||
+        ex.credential_offer?.cred_def_id ||
+        ex.credential?.cred_def_id
+      );
+    };
+    
     try {
       const credentialsResponse = await acaPyService.getAllIssuedCredentials();
-      // console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
       if (credentialsResponse) {
         const v1Records = credentialsResponse.v1 || [];
         const v2Records = credentialsResponse.v2 || [];
         credentialCount = v1Records.length + v2Records.length;
-
         const allRecords = [...v1Records, ...v2Records];
-        
-        for (const record of allRecords) {
-          const credExRecord = record.cred_ex_record;
-          if (credExRecord && credExRecord.state === 'done') {
-            const credDefId = credExRecord.by_format?.cred_proposal?.indy?.cred_def_id ||
-                            credExRecord.by_format?.cred_offer?.indy?.cred_def_id;
-            
-            if (credDefId) {
-              const credDefTag = credDefId.split(':').pop() || 'Unknown';
-              
-              // Initialize or update the credential definition summary
-              if (!credDefSummary[credDefTag]) {
-                credDefSummary[credDefTag] = {
-                  credDefId: credDefId,
-                  tag: credDefTag,
-                  count: 0,
-                  records: []
-                };
-              }
-              
-              credDefSummary[credDefTag].count++;
-              credDefSummary[credDefTag].records.push(record);
-              
-              // Keep legacy categorization for backward compatibility
-              const credDefTagUpper = credDefTag.toUpperCase();
-              if (credDefTagUpper.includes('STUDENT') && credDefTagUpper.includes('CARD')) {
-                credentialDetails.studentId.push(record);
-              } else if (credDefTagUpper.includes('TRANSCRIPT')) {
-                credentialDetails.transcript.push(record);
-              }
-            }
+        for (const wrapper of allRecords) {
+          const credExRecord = wrapper.cred_ex_record ?? wrapper;
+          if (!isFinished(credExRecord?.state)) continue;
+          const credDefId = getCredDefId(credExRecord);
+          if (!credDefId) continue;
+          const credDefTag = credDefId.split(':').pop() || 'Unknown';
+          if (!credDefSummary[credDefTag]) {
+            credDefSummary[credDefTag] = {
+              credDefId,
+              tag: credDefTag,
+              count: 0,
+              records: []
+            };
+          }
+          credDefSummary[credDefTag].count++;
+          credDefSummary[credDefTag].records.push(wrapper);
+          const tagUpper = credDefTag.toUpperCase();
+          if (tagUpper.includes('STUDENT') && tagUpper.includes('CARD')) {
+            credentialDetails.studentId.push(wrapper);
+          } else if (tagUpper.includes('TRANSCRIPT')) {
+            credentialDetails.transcript.push(wrapper);
           }
         }
-        
-        // console.log(`AcaPy API returned ${credentialCount} credentials`);
-        // console.log('Credential Definition Summary:', credDefSummary);
-        
-        await redisService.redisClient.set('credentials:all', JSON.stringify(credentialDetails), {
-          EX: redisConfig.ttl
-        });
-        
-        // Store credential definition summary separately
-        await redisService.redisClient.set('credentials:by_cred_def', JSON.stringify(credDefSummary), {
-          EX: redisConfig.ttl
-        });
+        await redisService.redisClient.set(
+          'credentials:all',
+          JSON.stringify(credentialDetails),
+          { EX: redisConfig.ttl }
+        );
+        await redisService.redisClient.set(
+          'credentials:by_cred_def',
+          JSON.stringify(credDefSummary),
+          { EX: redisConfig.ttl }
+        );
       } else {
-        console.log('AcaPy API returned no credentials or unexpected format');
-        
         const cachedCredentials = await redisService.redisClient.get('credentials:all');
         const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
-        
         if (cachedCredentials) {
           credentialDetails = JSON.parse(cachedCredentials);
-          credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
-          console.log(`Using cached credentials from Redis`);
+          credentialCount =
+            (credentialDetails.legacy?.length || 0) +
+            (credentialDetails.w3c?.length || 0);
         }
-        
         if (cachedCredDefSummary) {
           Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
-          console.log(`Using cached credential definition summary from Redis`);
         }
       }
     } catch (error: any) {
-      console.warn(`Could not fetch credentials from ACA-Py API: ${error.message}`);
-      
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
       const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
-      
       if (cachedCredentials) {
         credentialDetails = JSON.parse(cachedCredentials);
-        credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
-        console.log(`Using cached credentials from Redis after API error`);
+        credentialCount =
+          (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
       }
-      
       if (cachedCredDefSummary) {
         Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
-        console.log(`Using cached credential definition summary from Redis after API error`);
       }
     }
+    
 
     const filteredConnections = connectionDetails.filter((conn: any) => conn.state === 'active');
     
