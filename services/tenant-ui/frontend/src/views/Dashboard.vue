@@ -12,7 +12,7 @@
         :value="
           String(summary.find((item) => item.kind === 'Invited')?.count || 0)
         "
-      /> 
+      />
       <Card
         title="Failed"
         :value="
@@ -35,19 +35,22 @@
         :transcripts="0"
       />
     </div>
-    
+
     <div class="col-12 credentials-panel mt-4">
       <div class="p-card">
         <div class="p-card-header">
           <h3>{{ t('dashboard.issuedCredentialsByType') }}</h3>
         </div>
         <div class="p-card-body">
-          <div v-if="Object.keys(credentialsSummary).length === 0" class="no-credentials">
+          <div
+            v-if="Object.keys(credentialsSummary).length === 0"
+            class="no-credentials"
+          >
             <p>{{ t('dashboard.noCredentialsIssuedYet') }}</p>
           </div>
           <div v-else class="credentials-grid">
-            <div 
-              v-for="(credData, credTag) in credentialsSummary" 
+            <div
+              v-for="(credData, credTag) in credentialsSummary"
               :key="credTag"
               class="credential-item"
             >
@@ -58,11 +61,11 @@
         </div>
       </div>
     </div>
-    
+
     <button
+      v-tooltip.left="t('dashboard.refreshData')"
       class="p-button p-button-sm p-button-rounded p-button-text absolute bottom-0 right-0 mb-3 mr-3"
       style="z-index: 10"
-      v-tooltip.left="t('dashboard.refreshData')"
       @click="fetchSummaryData(true)"
     >
       <i class="pi pi-refresh"></i>
@@ -81,11 +84,7 @@ import Tooltip from 'primevue/tooltip';
 import { useI18n } from 'vue-i18n';
 
 interface SummaryItem {
-  kind:
-    | 'Message'
-    | 'Connection'
-    | 'Invited'
-    | 'Failed';
+  kind: 'Message' | 'Connection' | 'Invited' | 'Failed';
   count: number;
 }
 
@@ -111,7 +110,10 @@ const totalItems = computed(() =>
 );
 
 const totalCredentials = computed(() =>
-  Object.values(credentialsSummary.value).reduce((total, credData) => total + credData.count, 0)
+  Object.values(credentialsSummary.value).reduce(
+    (total, credData) => total + credData.count,
+    0
+  )
 );
 
 onMounted(async () => {
@@ -132,7 +134,7 @@ const fetchSummaryData = async (forceRefresh: boolean = false) => {
   try {
     let apiUrl = '/api/items/summary';
     let credentialsApiUrl = '/api/credentials/summary';
-    
+
     if (forceRefresh) {
       apiUrl += '?forceRefresh=true';
       credentialsApiUrl += '?forceRefresh=true';
@@ -152,14 +154,17 @@ const fetchSummaryData = async (forceRefresh: boolean = false) => {
     // Fetch both summary data and credentials summary in parallel
     const [summaryResponse, credentialsResponse] = await Promise.all([
       axios.get<SummaryItem[]>(apiUrl, config),
-      axios.get<CredentialDefSummary>(credentialsApiUrl, config)
+      axios.get<CredentialDefSummary>(credentialsApiUrl, config),
     ]);
-    
+
     summary.value = summaryResponse.data;
     credentialsSummary.value = credentialsResponse.data;
-    
+
     console.log('Dashboard: Summary data received:', summary.value);
-    console.log('Dashboard: Credentials summary received:', credentialsSummary.value);
+    console.log(
+      'Dashboard: Credentials summary received:',
+      credentialsSummary.value
+    );
 
     // Update API status with credential count
     if (totalCredentials.value > 0) {
@@ -189,18 +194,21 @@ const { t } = useI18n();
       grid-template-columns: 1fr;
     }
   }
-  
+
   .credentials-panel {
     .p-card {
       background: var(--surface-card);
       border-radius: 6px;
-      box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
-      
+      box-shadow:
+        0 2px 1px -1px rgba(0, 0, 0, 0.2),
+        0 1px 1px 0 rgba(0, 0, 0, 0.14),
+        0 1px 3px 0 rgba(0, 0, 0, 0.12);
+
       .p-card-header {
         padding: 1.25rem 1.25rem 0 1.25rem;
         border-bottom: 1px solid var(--surface-border);
         margin-bottom: 1.25rem;
-        
+
         h3 {
           margin: 0 0 1rem 0;
           font-size: 1.25rem;
@@ -208,30 +216,30 @@ const { t } = useI18n();
           color: var(--text-color);
         }
       }
-      
+
       .p-card-body {
         padding: 0 1.25rem 1.25rem 1.25rem;
-        
+
         .no-credentials {
           text-align: center;
           padding: 2rem;
           color: var(--text-color-secondary);
-          
+
           p {
             margin: 0;
             font-style: italic;
           }
         }
-        
+
         .credentials-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
           gap: 1rem;
-          
+
           @media screen and (max-width: 600px) {
             grid-template-columns: 1fr;
           }
-          
+
           .credential-item {
             background: var(--surface-ground);
             border: 1px solid var(--surface-border);
@@ -239,12 +247,12 @@ const { t } = useI18n();
             padding: 1rem;
             text-align: center;
             transition: all 0.2s ease;
-            
+
             &:hover {
               transform: translateY(-2px);
-              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }
-            
+
             .credential-tag {
               font-size: 0.875rem;
               font-weight: 600;
@@ -252,7 +260,7 @@ const { t } = useI18n();
               margin-bottom: 0.5rem;
               word-break: break-word;
             }
-            
+
             .credential-count {
               font-size: 1.5rem;
               font-weight: 700;
