@@ -151,8 +151,6 @@ router.get(
           console.log("Router: No cached data available, returning empty summary data");
           const defaultSummary = [
             { kind: "Connection", kind_id: 1, count: 0, source: 'acapy' },
-            { kind: "StudentID", kind_id: 2, count: 0, source: 'acapy' },
-            { kind: "Transcript", kind_id: 3, count: 0, source: 'acapy' },
             { kind: "Invited", kind_id: 4, count: 0, source: 'acapy' },
             { kind: "Failed", kind_id: 5, count: 0, source: 'acapy' },
             { kind: "Message", kind_id: 6, count: 0, source: 'acapy' }
@@ -166,6 +164,46 @@ router.get(
       res.status(200).json(JSON.parse(cachedResults));
     } catch (error: any) {
       console.error("Router: Error handling summary request:", error);
+      res.status(500).json({
+        error: "Database or API error",
+        details: error.message,
+      });
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/credentials/summary",
+  extractTokenMiddleware,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log("Router: Getting credential definition summary");
+      
+      const forceRefresh = req.query.forceRefresh === 'true';
+      console.log(`Router: forceRefresh parameter is ${forceRefresh}`);
+      
+      const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
+      
+      if (forceRefresh || !cachedCredDefSummary) {
+        console.log("Router: Queueing summary update request for credential definitions");
+        const token = req.headers['acapy-token'] as string || '';
+        await messageService.queueSummaryUpdate(token);
+        
+        if (cachedCredDefSummary) {
+          console.log("Router: Returning cached credential definition results while update is queued");
+          res.status(200).json(JSON.parse(cachedCredDefSummary));
+        } else {
+          console.log("Router: No cached credential definition data available, returning empty object");
+          res.status(200).json({});
+        }
+        return;
+      }
+      
+      console.log("Router: Returning cached credential definition summary data");
+      res.status(200).json(JSON.parse(cachedCredDefSummary));
+    } catch (error: any) {
+      console.error("Router: Error handling credential definition summary request:", error);
       res.status(500).json({
         error: "Database or API error",
         details: error.message,

@@ -297,6 +297,9 @@
       "edit": "Edit Connection",
       "search": "Search Connections"
     },
+    "createConnection": {
+      "createSuccess": "Contact successfully created."
+    },
     "didExchange": {
       "did": "DID",
       "didExchange": "DID Exchange"
@@ -363,7 +366,12 @@
     "onboarded": "Onboarded",
     "invited": "Invited",
     "failed": "Failed",
-    "noData": "No Data"
+    "noData": "No Data Available",
+    "studentIds": "Student IDs",
+    "transcripts": "Transcripts",
+    "issuedCredentialsByType": "Issued Credentials by Type",
+    "noCredentialsIssuedYet": "No credentials issued yet",
+    "refreshData": "Refresh Data"
   },
   "holder": {
     "holder": "Holder"
@@ -714,5 +722,8 @@
     "walletInformation": "Wallet Information",
     "walletDetails": "Wallet details",
     "logoUrl": "Logo URL"
+  },
+  "errors": {
+    "error": "Error"
   }
 }

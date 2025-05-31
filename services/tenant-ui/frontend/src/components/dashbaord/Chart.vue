@@ -1,4 +1,4 @@
-<template>
+\<template>
   <div class="dashboard-chart-card lg:ml-1">
     <div class="card-content">
       <div class="chart-titles">
@@ -36,14 +36,14 @@ const props = defineProps({
   failed: {
     type: Number,
     required: true,
-  },
+  }
 });
 
 const chartRef = ref<HTMLElement | null>(null);
 let chart: ApexCharts | null = null;
 
 const hasData = computed(
-  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0
+  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0 
 );
 const series = computed(() => [props.onboarded, props.invited, props.failed]);
 
@@ -58,7 +58,7 @@ const chartOptions = {
     t('dashboard.invited'),
     t('dashboard.failed'),
   ],
-  colors: ['#5B5BC1', '#3A3A3A', '#C45C5C'],
+  colors: ['#5B5BC1', '#3A3A3A', '#C45C5C', '#4CAF50', '#2196F3'],
   legend: {
     position: 'left',
     offsetY: 20,
