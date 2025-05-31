@@ -209,7 +209,7 @@ const showModal = ref(false);
 const studentFullName = ref(false);
 const loadingQRCode = ref(false);
 let response: any = null;
-const { createInvitation } = useConnectionStore();
+const { createOobInvitation } = useConnectionStore();
 const { idLookup } = useStudentStore();
 const issuerStore = useIssuerStore();
 const toast = useToast();
@@ -286,10 +286,22 @@ onUnmounted(() => {
 const submitForm = async () => {
   studentFullName.value = false;
   try {
-    const result: any = await createInvitation(
-      `${fullName.value} -studentID- ${studentId.value}`,
-      false
-    );
+    const aliasValue = `${fullName.value} -studentID- ${studentId.value}`;
+    const myLabelValue = tenantWallet.value?.settings['wallet.name'] || null;
+
+    const payload = {
+      accept: ['didcomm/aip1', 'didcomm/aip2;env=rfc19'],
+      alias: aliasValue,
+      handshake_protocols: [
+        'https://didcomm.org/didexchange/1.0',
+        'https://didcomm.org/connections/1.0',
+      ],
+      my_label: myLabelValue,
+      protocol_version: '1.1',
+      use_public_did: false,
+    };
+    // First argument is multi_use, second is the payload for the POST body
+    const result: any = await createOobInvitation(false, payload);
     if (result && result.invitation_url) {
       invitation_url.value = result.invitation_url;
       console.log(`Invitation URL: ${result.invitation_url}`);
