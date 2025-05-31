@@ -1,4 +1,4 @@
-<template>
+\<template>
   <div class="dashboard-chart-card lg:ml-1">
     <div class="card-content">
       <div class="chart-titles">
@@ -65,8 +65,6 @@ const chartOptions = {
     t('dashboard.onboarded'),
     t('dashboard.invited'),
     t('dashboard.failed'),
-    t('dashboard.studentIds'),
-    t('dashboard.transcripts'),
   ],
   colors: ['#5B5BC1', '#3A3A3A', '#C45C5C', '#4CAF50', '#2196F3'],
   legend: {

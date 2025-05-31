@@ -185,7 +185,7 @@
       "connections": "Connections <JA>",
       "delete": "Delete Connection <JA>",
       "edit": "Edit Connection <JA>",
-      "search": "Search Connections <JA>"
+      "search": "接続の検索"
     },
     "didExchange": {
       "did": "DID <JA>",
@@ -246,7 +246,10 @@
   "dashboard": {
     "backToDashboard": "Back to Dashboard <JA>",
     "dashboard": "Dashboard <JA>",
-    "greeting": "DigiCred CrMS <JA>"
+    "greeting": "DigiCred CrMS <JA>",
+    "issuedCredentialsByType": "Issued Credentials by Type",
+    "noCredentialsIssuedYet": "No credentials issued yet",
+    "refreshData": "Refresh Data"
   },
   "holder": {
     "holder": "Holder <JA>"
@@ -579,5 +582,11 @@
   },
   "log": {
     "log": "Log <JA>"
+  },
+  "createConnection": {
+    "createSuccess": "連絡先が正常に作成されました。"
+  },
+  "errors": {
+    "error": "エラー"
   }
 }

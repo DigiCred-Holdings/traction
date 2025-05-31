@@ -259,12 +259,18 @@ const { t } = useI18n();
               color: var(--text-color);
               margin-bottom: 0.5rem;
               word-break: break-word;
+              line-height: 1.2;
+              min-height: 2.4em;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
 
             .credential-count {
               font-size: 1.5rem;
               font-weight: 700;
               color: var(--primary-color);
+              margin-top: 0.5rem;
             }
           }
         }

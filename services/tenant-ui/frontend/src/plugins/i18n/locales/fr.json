@@ -185,7 +185,10 @@
       "connections": "Connections <FR>",
       "delete": "Delete Connection <FR>",
       "edit": "Edit Connection <FR>",
-      "search": "Search Connections <FR>"
+      "search": "Rechercher des connexions"
+    },
+    "createConnection": {
+      "createSuccess": "Contact créé avec succès."
     },
     "didExchange": {
       "did": "DID <FR>",
@@ -246,7 +249,10 @@
   "dashboard": {
     "backToDashboard": "Back to Dashboard <FR>",
     "dashboard": "Dashboard <FR>",
-    "greeting": "DigiCred CrMS <FR>"
+    "greeting": "DigiCred CrMS <FR>",
+    "issuedCredentialsByType": "Issued Credentials by Type",
+    "noCredentialsIssuedYet": "No credentials issued yet",
+    "refreshData": "Refresh Data"
   },
   "holder": {
     "holder": "Holder <FR>"
@@ -579,5 +585,8 @@
   },
   "log": {
     "log": "Log <FR>"
+  },
+  "errors": {
+    "error": "Erreur"
   }
 }
