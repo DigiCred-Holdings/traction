@@ -101,6 +101,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     }
 
     let credentialCount = 0;
+    console.log("credentialCount", credentialCount);
     let credentialDetails = {
       legacy: [] as any[],
       w3c: [] as any[],
