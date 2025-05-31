@@ -43,9 +43,9 @@ const chartRef = ref<HTMLElement | null>(null);
 let chart: ApexCharts | null = null;
 
 const hasData = computed(
-  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0 || props.studentIds > 0 || props.transcripts > 0
+  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0 
 );
-const series = computed(() => [props.onboarded, props.invited, props.failed, props.studentIds, props.transcripts]);
+const series = computed(() => [props.onboarded, props.invited, props.failed]);
 
 const chartOptions = {
   chart: {
