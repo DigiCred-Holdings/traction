@@ -65,7 +65,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     let connectionDetails = [];
     try {
       const connectionsResponse = await acaPyService.getConnections();
-      console.log("connectionsResponse", connectionsResponse);
+      // console.log("connectionsResponse", connectionsResponse);
       if (connectionsResponse && connectionsResponse.results) {
         connectionCount = connectionsResponse.results.length;
         connectionDetails = connectionsResponse.results.map((conn: any) => ({
@@ -74,19 +74,19 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
           alias: conn.alias || 'Unknown',
           created_at: conn.created_at
         }));
-        console.log(`AcaPy API returned ${connectionCount} connections`);
+        // console.log(`AcaPy API returned ${connectionCount} connections`);
         
         await redisService.redisClient.set('connections:all', JSON.stringify(connectionDetails), {
           EX: redisConfig.ttl
         });
       } else {
-        console.log('AcaPy API returned no connections or unexpected format');
+        // console.log('AcaPy API returned no connections or unexpected format');
         
         const cachedConnections = await redisService.redisClient.get('connections:all');
         if (cachedConnections) {
           connectionDetails = JSON.parse(cachedConnections);
           connectionCount = connectionDetails.length;
-          console.log(`Using ${connectionCount} cached connections from Redis`);
+          // console.log(`Using ${connectionCount} cached connections from Redis`);
         }
       }
     } catch (error: any) {
@@ -110,7 +110,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
 
     try {
       const credentialsResponse = await acaPyService.getAllIssuedCredentials();
-      console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
+      // console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
       if (credentialsResponse) {
         const v1Records = credentialsResponse.v1 || [];
         const v2Records = credentialsResponse.v2 || [];
@@ -151,8 +151,8 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
           }
         }
         
-        console.log(`AcaPy API returned ${credentialCount} credentials`);
-        console.log('Credential Definition Summary:', credDefSummary);
+        // console.log(`AcaPy API returned ${credentialCount} credentials`);
+        // console.log('Credential Definition Summary:', credDefSummary);
         
         await redisService.redisClient.set('credentials:all', JSON.stringify(credentialDetails), {
           EX: redisConfig.ttl
