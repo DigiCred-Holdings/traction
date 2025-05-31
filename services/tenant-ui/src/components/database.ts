@@ -161,6 +161,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
         { EX: redisConfig.ttl }
       );
     } catch (error: any) {
+      console.log("error", error);
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
       const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
       if (cachedCredentials) {
