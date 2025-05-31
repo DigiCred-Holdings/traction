@@ -37,15 +37,23 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  studentIds: {
+    type: Number,
+    required: true,
+  },
+  transcripts: {
+    type: Number,
+    required: true,
+  },
 });
 
 const chartRef = ref<HTMLElement | null>(null);
 let chart: ApexCharts | null = null;
 
 const hasData = computed(
-  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0
+  () => props.onboarded > 0 || props.invited > 0 || props.failed > 0 || props.studentIds > 0 || props.transcripts > 0
 );
-const series = computed(() => [props.onboarded, props.invited, props.failed]);
+const series = computed(() => [props.onboarded, props.invited, props.failed, props.studentIds, props.transcripts]);
 
 const chartOptions = {
   chart: {
@@ -57,8 +65,10 @@ const chartOptions = {
     t('dashboard.onboarded'),
     t('dashboard.invited'),
     t('dashboard.failed'),
+    t('dashboard.studentIds'),
+    t('dashboard.transcripts'),
   ],
-  colors: ['#5B5BC1', '#3A3A3A', '#C45C5C'],
+  colors: ['#5B5BC1', '#3A3A3A', '#C45C5C', '#4CAF50', '#2196F3'],
   legend: {
     position: 'left',
     offsetY: 20,

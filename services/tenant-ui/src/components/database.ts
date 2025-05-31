@@ -39,6 +39,15 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       source: string;
     };
 
+    type CredDefSummary = {
+      [credDefTag: string]: {
+        credDefId: string;
+        tag: string;
+        count: number;
+        records: any[];
+      };
+    };
+
     if (!forceRefresh) {
       const cachedResults = await redisService.redisClient.get('summary:items_by_kind');
       if (cachedResults) {
@@ -50,6 +59,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     }
 
     const formattedResults: SummaryItem[] = [];
+    const credDefSummary: CredDefSummary = {};
 
     let connectionCount = 0;
     let connectionDetails = [];
@@ -91,8 +101,6 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     }
 
     let credentialCount = 0;
-    let studentIdCount = 0;
-    let transcriptCount = 0;
     let credentialDetails = {
       legacy: [] as any[],
       w3c: [] as any[],
@@ -104,63 +112,88 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       const credentialsResponse = await acaPyService.getAllIssuedCredentials();
       console.log("credentialsResponse", JSON.stringify(credentialsResponse, null, 2));
       if (credentialsResponse) {
-        // Count total credentials from both v1 and v2 records
         const v1Records = credentialsResponse.v1 || [];
         const v2Records = credentialsResponse.v2 || [];
         credentialCount = v1Records.length + v2Records.length;
 
-        // Process all records
         const allRecords = [...v1Records, ...v2Records];
         
         for (const record of allRecords) {
           const credExRecord = record.cred_ex_record;
           if (credExRecord && credExRecord.state === 'done') {
-            // Get credential definition ID from the by_format section
             const credDefId = credExRecord.by_format?.cred_proposal?.indy?.cred_def_id ||
                             credExRecord.by_format?.cred_offer?.indy?.cred_def_id;
             
             if (credDefId) {
-              // Extract tag from credential definition ID (last part after final colon)
-              const credDefTag = credDefId.split(':').pop()?.toUpperCase() || '';
+              const credDefTag = credDefId.split(':').pop() || 'Unknown';
               
-              if (credDefTag.includes('STUDENT') && credDefTag.includes('CARD')) {
+              // Initialize or update the credential definition summary
+              if (!credDefSummary[credDefTag]) {
+                credDefSummary[credDefTag] = {
+                  credDefId: credDefId,
+                  tag: credDefTag,
+                  count: 0,
+                  records: []
+                };
+              }
+              
+              credDefSummary[credDefTag].count++;
+              credDefSummary[credDefTag].records.push(record);
+              
+              // Keep legacy categorization for backward compatibility
+              const credDefTagUpper = credDefTag.toUpperCase();
+              if (credDefTagUpper.includes('STUDENT') && credDefTagUpper.includes('CARD')) {
                 credentialDetails.studentId.push(record);
-                studentIdCount++;
-              } else if (credDefTag.includes('TRANSCRIPT')) {
+              } else if (credDefTagUpper.includes('TRANSCRIPT')) {
                 credentialDetails.transcript.push(record);
-                transcriptCount++;
               }
             }
           }
         }
         
-        console.log(`AcaPy API returned ${credentialCount} credentials (${studentIdCount} Student IDs, ${transcriptCount} Transcripts)`);
+        console.log(`AcaPy API returned ${credentialCount} credentials`);
+        console.log('Credential Definition Summary:', credDefSummary);
         
         await redisService.redisClient.set('credentials:all', JSON.stringify(credentialDetails), {
+          EX: redisConfig.ttl
+        });
+        
+        // Store credential definition summary separately
+        await redisService.redisClient.set('credentials:by_cred_def', JSON.stringify(credDefSummary), {
           EX: redisConfig.ttl
         });
       } else {
         console.log('AcaPy API returned no credentials or unexpected format');
         
         const cachedCredentials = await redisService.redisClient.get('credentials:all');
+        const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
+        
         if (cachedCredentials) {
           credentialDetails = JSON.parse(cachedCredentials);
-          studentIdCount = credentialDetails.studentId?.length || 0;
-          transcriptCount = credentialDetails.transcript?.length || 0;
           credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
           console.log(`Using cached credentials from Redis`);
+        }
+        
+        if (cachedCredDefSummary) {
+          Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
+          console.log(`Using cached credential definition summary from Redis`);
         }
       }
     } catch (error: any) {
       console.warn(`Could not fetch credentials from ACA-Py API: ${error.message}`);
       
       const cachedCredentials = await redisService.redisClient.get('credentials:all');
+      const cachedCredDefSummary = await redisService.redisClient.get('credentials:by_cred_def');
+      
       if (cachedCredentials) {
         credentialDetails = JSON.parse(cachedCredentials);
-        studentIdCount = credentialDetails.studentId?.length || 0;
-        transcriptCount = credentialDetails.transcript?.length || 0;
         credentialCount = (credentialDetails.legacy?.length || 0) + (credentialDetails.w3c?.length || 0);
         console.log(`Using cached credentials from Redis after API error`);
+      }
+      
+      if (cachedCredDefSummary) {
+        Object.assign(credDefSummary, JSON.parse(cachedCredDefSummary));
+        console.log(`Using cached credential definition summary from Redis after API error`);
       }
     }
 
@@ -174,20 +207,6 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       kind: ItemKind.Connection,
       kind_id: 1,
       count: filteredConnections.length,
-      source: 'acapy',
-    });
-
-    formattedResults.push({
-      kind: ItemKind.StudentID,
-      kind_id: 2,
-      count: studentIdCount,
-      source: 'acapy',
-    });
-
-    formattedResults.push({
-      kind: ItemKind.Transcript,
-      kind_id: 3,
-      count: transcriptCount,
       source: 'acapy',
     });
 
@@ -229,6 +248,12 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
     formattedResults.forEach((item: any) => {
       console.log(`${item.kind} (${item.kind_id}): ${item.count} items from ${item.source}`);
     });
+    
+    console.log("\n=== Credential Definition Summary ===");
+    Object.entries(credDefSummary).forEach(([tag, data]) => {
+      console.log(`${tag}: ${data.count} credentials`);
+    });
+    
     await redisService.redisClient.set('summary:items_by_kind', JSON.stringify(formattedResults), {
       EX: redisConfig.ttl 
     });
