@@ -128,7 +128,7 @@
               <td>{{ (term.term_grade_points || 0).toFixed(2) }}</td>
               <td colspan="2">GPA = {{ (term.term_gpa || 0).toFixed(3) }}</td>
             </tr>
-            <tr class="totals-row" v-if="term.cumulative_gpa !== undefined">
+            <tr v-if="term.cumulative_gpa !== undefined" class="totals-row">
               <td colspan="4" class="text-right">Cumulative Totals</td>
               <td>{{ (term.cumulative_hours_attempted || 0).toFixed(2) }}</td>
               <td>{{ (term.cumulative_hours_completed || 0).toFixed(2) }}</td>
@@ -139,7 +139,7 @@
             </tr>
           </tbody>
         </table>
-        <p class="academic-standing" v-if="term.academic_standing">
+        <p v-if="term.academic_standing" class="academic-standing">
           Academic Standing: {{ term.academic_standing }}
         </p>
       </div>
@@ -166,8 +166,8 @@
 
   <!-- Page 2 Content -->
   <div
-    class="transcript-page-2-content"
     ref="page2View"
+    class="transcript-page-2-content"
     style="page-break-before: always"
   >
     <img src="/img/pdf/logo-pdf.svg" class="watermark" alt="Watermark" />

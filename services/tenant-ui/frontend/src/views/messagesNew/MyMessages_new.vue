@@ -54,7 +54,7 @@ const openSendDialog = () => {
 const startBroadcast = async () => {
   try {
     broadcastStarted.value = true;
-    
+
     const response = await axios.post(
       '/api/messages/broadcast',
       {
@@ -75,7 +75,6 @@ const startBroadcast = async () => {
     toast.error(t('messages.broadcastFailed'));
   }
 };
-
 </script>
 
 <template>
