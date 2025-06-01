@@ -28,7 +28,7 @@
     "create": "Create Workflow",
     "edit": "Edit Workflow"
   },
-  "enrollment":{
+  "enrollment": {
     "enrollment": "Enrollment",
     "list": "Enrollments",
     "information": "Enrollment Information",
@@ -38,10 +38,10 @@
     "id": "ID",
     "name": "Name:",
     "dateOfBirth": "DOB:",
-    "address":"Address:",
-    "phone":"Phone:",
-    "email":"Email:",
-    "enrollmentStatus":"Enrollment Status",
+    "address": "Address:",
+    "phone": "Phone:",
+    "email": "Email:",
+    "enrollmentStatus": "Enrollment Status",
     "enrollmentStatusOptions": {
       "pending": "Pending",
       "approved": "Approved",
@@ -68,7 +68,7 @@
     "unweightedGPA": "Unweighted GPA:",
     "transcriptDate": "Transcript Date:",
     "transcriptComments": "Transcript Comments:",
-    "download":"Download Transcript",
+    "download": "Download Transcript",
     "downloadTranscriptOptions": {
       "pdf": ".pdf",
       "tiff": ".tiff"
@@ -725,5 +725,39 @@
   },
   "errors": {
     "error": "Error"
+  },
+  "enrollments": {
+    "enrollments": "Enrollments",
+    "studentId": "Student ID",
+    "name": "Name",
+    "school": "School",
+    "status": "Status",
+    "applicationDate": "Application Date",
+    "search": "Search",
+    "studentInformation": "Student Information",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "dob": "DOB",
+    "schoolInformation": "School Information",
+    "graduation": "Graduation",
+    "gpa": "GPA",
+    "year": "Year",
+    "gradeLevel": "Grade Level",
+    "credits": "Credits",
+    "courses": "Courses",
+    "transcript": "Transcript",
+    "program": "Program",
+    "classRank": "Class Rank",
+    "date": "Date",
+    "comments": "Comments",
+    "weightedGPA": "Weighted GPA",
+    "unweightedGPA": "Unweighted GPA",
+    "grade": "Grade",
+    "term": "Term",
+    "enrolmentDetails": "Enrolment Details",
+    "downloadTranscript": "Download Transcript",
+    "page": "Page",
+    "noCourses": "No courses available"
   }
 }
