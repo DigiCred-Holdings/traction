@@ -8,31 +8,6 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 class TiffService {
-  private imageMagickAvailable: boolean | null = null;
-
-  /**
-   * Check if ImageMagick is available on the system
-   */
-  private async checkImageMagickAvailable(): Promise<boolean> {
-    if (this.imageMagickAvailable !== null) {
-      return this.imageMagickAvailable;
-    }
-
-    try {
-      await execAsync("which convert");
-      this.imageMagickAvailable = true;
-      console.log("ImageMagick is available");
-      return true;
-    } catch (error: any) {
-      console.error("Error checking ImageMagick availability:", error);
-      console.warn(
-        "ImageMagick not found, will use Sharp-only method for TIFF generation"
-      );
-      this.imageMagickAvailable = false;
-      return false;
-    }
-  }
-
   /**
    * Convert base64 image data to TIFF buffer
    * @param imageData Base64 encoded image data (without data URL prefix)
@@ -65,15 +40,6 @@ class TiffService {
    * @returns Multi-page TIFF buffer
    */
   async generateMultiPageTiff(images: string[]): Promise<Buffer> {
-    // Check if ImageMagick is available
-    const hasImageMagick = await this.checkImageMagickAvailable();
-
-    if (!hasImageMagick) {
-      // Fall back to Sharp-only method
-      console.log("Using Sharp-only method for TIFF generation");
-      return this.generateCombinedTiff(images);
-    }
-
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "tiff-"));
     const tempFiles: string[] = [];
 
