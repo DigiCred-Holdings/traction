@@ -4,8 +4,8 @@ WORKDIR /usr/src/app
 # Copy all files from the current directory to the container
 COPY . .
 
-# Install Bash and Redis client
-RUN apk update && apk add bash redis
+# Install Bash, Redis client, and ImageMagick
+RUN apk update && apk add bash redis imagemagick
 
 # Install backend libraries
 RUN npm cache clean --force && npm ci --verbose
