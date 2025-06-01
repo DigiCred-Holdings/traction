@@ -71,9 +71,10 @@ const tenantRoutes: RouteRecordRaw[] = [
       },
       //Enrollment
       {
-        path: '/enrollment',
-        name: 'Enrollment',
-        component: Enrollment,
+        path: '/enrollments',
+        name: 'Enrollments',
+        component: Enrollments,
+        meta: { title: 'Enrollments' },
       },
       // Transcript
       // About
@@ -82,13 +83,6 @@ const tenantRoutes: RouteRecordRaw[] = [
         name: 'transcript',
         component: Transcript,
         meta: { title: 'Transcript' },
-      },
-      // Enrollments
-      {
-        path: '/Enrollments',
-        name: 'enrollments',
-        component: Enrollments,
-        // meta: { title: 'Enrolments' },
       },
       // About
       {
