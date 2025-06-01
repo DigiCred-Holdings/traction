@@ -96,7 +96,7 @@
       :show-filter-match-modes="false"
     >
       <template #body="{ data }">
-        {{ formatDate(data.created_at)}}
+        {{ formatDate(data.created_at) }}
       </template>
       <template #filter="{ filterModel, filterCallback }">
         <InputText
@@ -160,7 +160,14 @@ const tenantStore = useTenantStore();
 const webhookUrl = ref(null);
 const webhookKey = ref(null);
 const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
   return new Date(date).toLocaleDateString('en-US', options);
 };
 const loadTenantSettings = async () => {
