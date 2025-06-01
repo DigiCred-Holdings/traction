@@ -25,6 +25,8 @@ import BulkIssue from '@/views/bulkIssue/BulkIssue.vue';
 import MyPresentations from '@/views/verification/MyPresentations.vue';
 // // Holder
 import MyHeldCredentials from '@/views/holder/MyHeldCredentials.vue';
+// Enrolments
+import Enrollments from '@/views/enrollments/Enrollments.vue';
 // Messages
 import MyMessages from '@/views/messages/MyMessages.vue';
 // OCA
@@ -81,7 +83,13 @@ const tenantRoutes: RouteRecordRaw[] = [
         component: Transcript,
         meta: { title: 'Transcript' },
       },
-
+      // Enrollments
+      {
+        path: '/Enrollments',
+        name: 'enrollments',
+        component: Enrollments,
+        // meta: { title: 'Enrolments' },
+      },
       // About
       {
         path: '/about',

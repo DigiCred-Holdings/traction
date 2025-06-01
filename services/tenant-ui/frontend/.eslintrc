@@ -40,5 +40,13 @@
       "localeDir": "./src/locales/*.json",
       "messageSyntaxVersion": "^9.2.2"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/components/enrollments/TranscriptPrintableView.vue"],
+      "rules": {
+        "@intlify/vue-i18n/no-raw-text": "off"
+      }
+    }
+  ]
 }

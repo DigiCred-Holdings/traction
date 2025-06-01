@@ -51,6 +51,11 @@ const sidebarItems = [
     route: '/transcript',
   },
   {
+    label: t('enrollments.enrollments'),
+    icon: 'pi pi-fw pi-graduation-cap',
+    route: '/enrollments',
+  },
+  {
     label: t('workflow.workflow'),
     icon: 'pi pi-fw pi-file-edit',
     route: '/workflow-list',
