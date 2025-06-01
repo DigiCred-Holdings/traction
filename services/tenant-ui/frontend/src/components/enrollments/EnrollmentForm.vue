@@ -10,7 +10,7 @@
       />
       <h2 class="lg:text-xl text-lg font-bold">
         {{ enrollment.student_full_name }}
-        {{ $t('enrollments.enrolmentDetails') }}
+        {{ $t('enrollments.enrollmentDetails') }}
       </h2>
     </div>
     <div
