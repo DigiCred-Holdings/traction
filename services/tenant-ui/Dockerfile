@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install Bash and Redis client
-RUN apk update && apk add bash redis
+RUN apk update && apk add bash redis imagemagick imagemagick-tiff
 
 # Install backend libraries
 RUN npm cache clean --force && npm ci --verbose

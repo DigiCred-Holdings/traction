@@ -755,7 +755,7 @@
     "unweightedGPA": "Unweighted GPA",
     "grade": "Grade",
     "term": "Term",
-    "enrolmentDetails": "Enrolment Details",
+    "enrollmentDetails": "Enrollment Details",
     "downloadTranscript": "Download Transcript",
     "page": "Page",
     "noCourses": "No courses available"
