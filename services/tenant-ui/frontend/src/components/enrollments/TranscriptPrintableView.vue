@@ -61,7 +61,9 @@
             :key="'transfer-' + index"
           >
             <td>{{ course.course_code }}</td>
-            <td>{{ course.title }}</td>
+            <td style="max-width: 150px">
+              {{ truncateText(course.title, 20) }}
+            </td>
             <td>{{ (course.credits_earned || 0).toFixed(2) }}</td>
             <td>{{ course.transfer_school_name }}</td>
           </tr>
@@ -112,7 +114,9 @@
               :key="'course-' + termIndex + '-' + courseIndex"
             >
               <td>{{ course.courseCode }}</td>
-              <td>{{ course.courseTitle }}</td>
+              <td style="max-width: 150px">
+                {{ truncateText(course.courseTitle, 20) }}
+              </td>
               <td>{{ course.grade }}</td>
               <td>{{ course.repeat_indicator || '' }}</td>
               <td>{{ (course.hours_attempted || 0).toFixed(2) }}</td>
@@ -458,6 +462,13 @@ const totalTransferCredits = computed(() => {
     0
   );
 });
+
+const truncateText = (text, maxLength) => {
+  if (typeof text === 'string' && text.length > maxLength) {
+    return text.substring(0, maxLength - 3) + '...';
+  }
+  return text;
+};
 </script>
 
 <style scoped>
