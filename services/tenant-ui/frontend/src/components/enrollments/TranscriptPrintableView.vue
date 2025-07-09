@@ -115,27 +115,25 @@
               <td>{{ course.courseTitle }}</td>
               <td>{{ course.grade }}</td>
               <td>{{ course.repeat_indicator || '' }}</td>
-              <td>{{ (course.hours_attempted || 0).toFixed(2) }}</td>
-              <td>{{ (course.hours_completed || 0).toFixed(2) }}</td>
-              <td>{{ (course.grade_points || 0).toFixed(2) }}</td>
+              <td>{{ course.hours_attempted || '0' }}</td>
+              <td>{{ course.hours_completed || '0' }}</td>
+              <td>{{ course.grade_points || '0' }}</td>
               <td>{{ formatDateRange(course.start_date, course.end_date) }}</td>
               <td>{{ course.shell_crs_indicator || '' }}</td>
             </tr>
             <tr class="totals-row">
               <td colspan="4" class="text-right">Term Totals</td>
-              <td>{{ (term.term_hours_attempted || 0).toFixed(2) }}</td>
-              <td>{{ (term.term_hours_completed || 0).toFixed(2) }}</td>
-              <td>{{ (term.term_grade_points || 0).toFixed(2) }}</td>
+              <td>{{ term.term_hours_attempted || '0' }}</td>
+              <td>{{ term.term_hours_completed || '0' }}</td>
+              <td>{{ term.term_grade_points || '0' }}</td>
               <td colspan="2">GPA = {{ (term.term_gpa || 0).toFixed(3) }}</td>
             </tr>
             <tr v-if="term.cumulative_gpa !== undefined" class="totals-row">
               <td colspan="4" class="text-right">Cumulative Totals</td>
-              <td>{{ (term.cumulative_hours_attempted || 0).toFixed(2) }}</td>
-              <td>{{ (term.cumulative_hours_completed || 0).toFixed(2) }}</td>
-              <td>{{ (term.cumulative_grade_points || 0).toFixed(2) }}</td>
-              <td colspan="2">
-                GPA = {{ (term.cumulative_gpa || 0).toFixed(3) }}
-              </td>
+              <td>{{ term.cumulative_hours_attempted || '0' }}</td>
+              <td>{{ term.cumulative_hours_completed || '0' }}</td>
+              <td>{{ term.cumulative_grade_points || '0' }}</td>
+              <td colspan="2">GPA = {{ term.cumulative_gpa || '0' }}</td>
             </tr>
           </tbody>
         </table>

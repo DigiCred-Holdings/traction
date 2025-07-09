@@ -1,7 +1,6 @@
 import config from "config";
 import cors from "cors";
 import express from "express";
-//import helmet from "helmet";
 import path from "path";
 
 import { router } from "./routes/router";
@@ -21,34 +20,21 @@ const app = express();
 // Disable X-Powered-By header for security
 app.disable("x-powered-by");
 
-// Apply Helmet's default security headers
-/* app.use(helmet());
-
-// Apply a specific Content Security Policy
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      // It's likely need to adjust this later to allow resources from CDNs or other trusted domains that our application uses.
-      defaultSrc: ["'self'"], // Which means that the only sources of content are the same origin
-      // Add other directives here as needed, for example:
-      // scriptSrc: ["'self'", "trusted-cdn.com"],
-      // styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if necessary
-      // imgSrc: ["'self'", "data:"] // Allow data URIs for images
-    },
-  })
-); */
+app.use(function (req, res, next) {
+  res.setHeader(
+    'Content-Security-Policy', "default-src 'self'; script-src 'self' trusted-cdn.com; connect-src 'self' localhost *.digicred.services; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://crms-images.s3.us-east-1.amazonaws.com data:; frame-src 'self'; frame-ancestors 'none'; form-action 'self';"
+  );
+  
+  next();
+});
 
 app.use(history());
 
-/* // Configure CORS
-const corsOptions = {
-  origin:
-    CORS_ALLOWED_ORIGINS === "*"
-      ? "*"
-      : CORS_ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()),
-};
-app.use(cors(corsOptions)); */
-app.use(cors()); 
+app.use(cors({
+  origin: 'https://dev-controllers.digicred.services',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));

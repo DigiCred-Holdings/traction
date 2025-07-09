@@ -14,6 +14,7 @@ import 'primeflex/primeflex.css';
 import Toast from 'vue-toastification';
 import toastOptions from '@/plugins/toasts/vueToastification';
 import i18n from '@/plugins/i18n/i18n';
+import helmet from 'helmet';
 
 async function loadApp() {
   const app = createApp(App);

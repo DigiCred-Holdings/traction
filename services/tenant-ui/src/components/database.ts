@@ -190,7 +190,7 @@ export const countItemsByKind = async (forceRefresh: boolean = false) => {
       source: 'acapy',
     });
 
-    console.log("connectionDetails", connectionDetails);
+    // console.log("connectionDetails", connectionDetails);
     const invitedConnections = connectionDetails.filter((conn: any) => conn.state === 'request' || conn.state === 'invitation');
     
     await redisService.redisClient.set('connections:invited', JSON.stringify(invitedConnections), {

@@ -60,6 +60,8 @@ class AcaPyService {
       }
 
       const response: AxiosResponse = await axios(requestConfig);
+      const output = response.data;
+      console.log("++++++++++++  Endpoint=", endpoint, "\ndata=", output?.results.length)
       return response.data;
     } catch (error) {
       console.error('AcaPyService: Request failed:', error);
@@ -75,7 +77,7 @@ class AcaPyService {
   }
 
   async getConnections(params: any = {}): Promise<any> {
-    return this.request('GET', '/connections', null, { params });
+    return this.request('GET', '/connections?descending=false&limit=5000&offset=0&order_by=id', null, { params });
   }
 
   async getConnection(connectionId: string): Promise<any> {
@@ -96,7 +98,7 @@ class AcaPyService {
 
   async getCredentials(params: any = {}): Promise<any> {
     console.log('AcaPyService: Getting legacy credentials');
-    return this.request('GET', '/credentials', null, { params });
+    return this.request('GET', '/credentials?limit=5000&offset=0&start=0', null, { params });
   }
 
   async getAllCredentials(params: any = {}): Promise<any> {
@@ -127,11 +129,11 @@ class AcaPyService {
   }
 
   async getIssueCredentialRecords(params: any = {}): Promise<any> {
-    return this.request('GET', '/issue-credential/records', null, { params });
+    return this.request('GET', '/issue-credential/records?limit=5000&offset=0&start=0', null, { params });
   }
 
   async getIssueCredentialV2Records(params: any = {}): Promise<any> {
-    return this.request('GET', '/issue-credential-2.0/records', null, { params });
+    return this.request('GET', '/issue-credential-2.0/records?limit=5000&offset=0&start=0', null, { params });
   }
 
   async getAllIssuedCredentials(params: any = {}): Promise<any> {
