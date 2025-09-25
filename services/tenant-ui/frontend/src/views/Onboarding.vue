@@ -261,7 +261,7 @@ const initializeSocket = () => {
 };
 
 onMounted(() => {
-  initializeSocket();
+  //initializeSocket();
   loadTenantSettings();
 });
 const { tenantWallet } = storeToRefs(useTenantStore());

@@ -51,6 +51,7 @@
   "server": {
     "tractionUrl": "SERVER_TRACTION_URL",
     "lokiUrl": "SERVER_LOKI_URL",
+    "content-security-policy": "CONTENT_SECURITY_POLICY",
     "corsAllowedOrigins": "CORS_ALLOWED_ORIGINS",
     "oidc": {
       "jwksUri": "SERVER_OIDC_JWKS",
