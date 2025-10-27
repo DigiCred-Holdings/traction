@@ -32,6 +32,8 @@ data:
   #SERVER_TRACTION_URL: http://{{ include "tenant_proxy.fullname" . }}:{{ .Values.tenant_proxy.service.port }}
   SERVER_TRACTION_URL: {{ "http://proxy-traction.digicred.services" }}
   SERVER_LOKI_URL: {{ .Values.ui.lokiUrl | quote }}
+  CORS_ALLOWED_ORIGINS: {{ .Values.ui.corsAllowedOrigins | quote }}
+  CONTENT_SECURITY_POLICY: {{ .Values.ui.content-security-policy | quote }}
   UX_APP_INNKEEPER_TITLE: {{ .Values.ui.ux.appInnkeeperTitle | quote }}
   UX_APP_TITLE: {{ .Values.ui.ux.appTitle | quote }}
   UX_COPYRIGHT: {{ .Values.ui.ux.copyright | quote }}
