@@ -56,7 +56,7 @@ export const useConnectionStore = defineStore('connection', () => {
 
   async function listConnections() {
     selectedConnection.value = null;
-    return fetchList(API_PATH.CONNECTIONS, connections, error, loading, {});
+    return fetchList(API_PATH.CONNECTIONS, connections, error, loading, {limit: 1500});
   }
 
   async function createInvitation(alias: string, multiUse: boolean) {
