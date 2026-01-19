@@ -1,12 +1,21 @@
+import axios from 'axios';
 import { defineStore, storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { useConfigStore } from '../configStore';
 import { UserManager } from 'oidc-client-ts';
 import { configStringToObject } from '@/helpers';
+import { API_PATH } from '@/helpers/constants';
+// import { useTokenStore } from '../tokenStore';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
+import { useTenantStore, useTokenStore } from '../../store';
 
 export const useOidcStore = defineStore('oidcStore', () => {
   // Stores
   const { config } = storeToRefs(useConfigStore());
+  const { token } = storeToRefs(useTokenStore());
+  const toast = useToast();
+  const router = useRouter();
 
   const settings: any = {
     authority: config.value.frontend.oidc.authority,
@@ -38,8 +47,42 @@ export const useOidcStore = defineStore('oidcStore', () => {
       const oidcUser = await userManager.getUser();
       user.value = oidcUser;
 
+      const loginCfg = {
+        headers: { Authorization: `Bearer ${oidcUser?.access_token}` },
+      };
+      const response: any = await axios.get(
+        // API_PATH.OIDC_INNKEEPER_LOGIN,
+        API_PATH.OIDC_OIDC_LOGIN,
+        loginCfg
+      );
+      token.value = response.data.token;
+      if (token.value) localStorage.setItem('token', token.value);
+
       // Strip the oidc return params
       window.history.pushState({}, document.title);
+
+      // token is loaded, now go fetch the global data about the tenant
+      if (token.value) {
+        try {
+          const tenantStore = useTenantStore();
+          const results = await Promise.allSettled([
+            tenantStore.getSelf(),
+            tenantStore.getTenantConfig(),
+            tenantStore.getIssuanceStatus(),
+          ]);
+          // if any the Tenant details fetch fails, throw the first error
+          results.forEach((result) => {
+            if (result.status === 'rejected') {
+              throw result.reason;
+            }
+          });
+          router.push({ name: 'Dashboard' });
+        } catch (err) {
+          console.error(err);
+          toast.error(`Failure getting tenant info: ${err}`);
+        }
+      }
+
     } catch (err: any) {
       error.value = err;
     } finally {

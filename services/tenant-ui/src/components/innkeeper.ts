@@ -8,10 +8,28 @@ const INNKEEPER_KEY = config.get("server.innkeeper.key");
  * @function login
  * Use the configured Inkeeper Admin key to get the token
  * @returns {string} The inkeeper token
+ * https://digicred.z.wolkins.net:3020/proxy/multitenancy/wallet/ab1d492c-3c4e-4c3e-b7d2-ff098f028174/token
+ * https://digicred.z.wolkins.net:3020/proxy/multitenancy/tenant/ab1d492c-3c4e-4c3e-b7d2-ff098f028174/token
  */
 export const login = async () => {
   const loginUrl = `${TRACTION_URL}/multitenancy/tenant/${INNKEEPER_USER}/token`;
   const payload = { wallet_key: INNKEEPER_KEY };
+  console.log("Innkeeper login URL:", loginUrl);
+  console.log("Innkeeper login payload:", payload);
+  const res = await axios({
+    method: "post",
+    url: loginUrl,
+    data: payload,
+  });
+
+  return res.data;
+};
+
+export const oidcLogin = async () => {
+  const loginUrl = `${TRACTION_URL}/multitenancy/wallet/${INNKEEPER_USER}/token`;
+  const payload = { wallet_key: INNKEEPER_KEY };
+  console.log("Innkeeper login URL:", loginUrl);
+  console.log("Innkeeper login payload:", payload);
   const res = await axios({
     method: "post",
     url: loginUrl,

@@ -75,7 +75,32 @@ router.get(
         const result = await innkeeperComponent.login();
         res.status(200).send(result);
       } else {
-        res.status(403).send();
+        res.status(403).send({ error: "User does not have required role", claims: req.claims });
+      }
+    } catch (error) {
+      console.error(`Error logging in: ${error}`);
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/oidcLogin",
+  oidcMiddleware,
+  async (req: any, res: Response, next: NextFunction) => {
+    try {
+      console.log(req.claims);
+      if (
+        req.claims.realm_access &&
+        req.claims.realm_access.roles &&
+        req.claims.realm_access.roles.includes(
+          config.get("server.oidc.roleName")
+        )
+      ) {
+        const result = await innkeeperComponent.oidcLogin();
+        res.status(200).send(result);
+      } else {
+        res.status(403).send({ error: "User does not have required role", claims: req.claims });
       }
     } catch (error) {
       console.error(`Error logging in: ${error}`);
