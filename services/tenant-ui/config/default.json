@@ -60,13 +60,9 @@
     "content-security-policy": "CONTENT_SECURITY_POLICY",
     "corsAllowedOrigins": "CORS_ALLOWED_ORIGINS",
     "oidc": {
-      "clientId": "",
-      "clientSecret": "",
       "jwksUri": "https://dev.loginproxy.gov.bc.ca/auth/realms/digitaltrust-citz/protocol/openid-connect/certs",
-      "authority": "https://dev.loginproxy.gov.bc.ca/auth/realms/digitaltrust-citz",
       "realm": "digitaltrust-citz",
-      "roleName": "innkeeper",
-      "allowedUsers": ""
+      "roleName": "innkeeper"
     },
     "innkeeper": {
       "user": "innkeeper",
