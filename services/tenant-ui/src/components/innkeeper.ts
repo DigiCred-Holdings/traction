@@ -21,18 +21,6 @@ export const login = async () => {
   return res.data;
 };
 
-export const oidcLogin = async () => {
-  const loginUrl = `${TRACTION_URL}/multitenancy/wallet/${INNKEEPER_USER}/token`;
-  const payload = { wallet_key: INNKEEPER_KEY };
-  const res = await axios({
-    method: "post",
-    url: loginUrl,
-    data: payload,
-  });
-
-  return res.data;
-};
-
 /**
  * @function createReservation
  * Create a reservation in Traction

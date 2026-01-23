@@ -1,10 +1,5 @@
 <template>
-  <Button
-    class="w-full mt-5"
-    :label="config.frontend.oidc.label"
-    :loading="loading"
-    @click="login"
-  />
+  <Button class="w-full mt-5" label="IDIR" :loading="loading" @click="login" />
   <!-- eslint-disable-next-line @intlify/vue-i18n/no-raw-text -->
   <div v-if="error">{{ $t('admin.error') }}: {{ error }}</div>
 </template>
@@ -12,12 +7,9 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
 import { useOidcStore } from '@/store';
-import { useConfigStore } from '../../store';
 
 import { storeToRefs } from 'pinia';
 import { useToast } from 'vue-toastification';
-
-const { config } = storeToRefs(useConfigStore());
 
 const toast = useToast();
 const oidcStore = useOidcStore();
