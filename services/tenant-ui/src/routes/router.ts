@@ -86,16 +86,11 @@ router.get(
   }
 );
 
-console.log("Router loaded");
 router.post(
   "/oidcLogin",
   oidcGoogleMiddleware,
   async (req: any, res: Response, next: NextFunction) => {
     try {
-      // console.log("OIDC Login endpoint invoked");
-      // await oidcGoogleMiddleware(req, res, async () => {
-      //   console.log("Inside OIDC Google Middleware callback");
-      // });
       const allowedUsers = config.get<string>("server.oidc.allowedUsers").split(',').map(u => u.trim());
       const allowedUsersPopulated = allowedUsers.length !== 0 && allowedUsers.every(u => u.length !== 0);
       const tenantId: string = config.get("server.innkeeper.user");
@@ -120,12 +115,11 @@ router.post(
         res.status(200).send(result);
       } else {
         console.log(`User "${req.claims.name} <${req.claims.email}> ($${req.claims.sub})" attempted to log in but is not an authorized user.`);
-        res.status(403).send({ error: "User does not have required role" });
+        res.status(403).send({ error: "User is not authorized to use the system" });
       }
     } catch (error) {
       console.error(`Error logging in: ${error}`);
-      res.status(200).send({"result": "testing"});
-      // next(error);
+      next(error);
     }
   }
 );

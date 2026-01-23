@@ -25,12 +25,9 @@ class UserManager_TactionOverride extends UserManager {
   public async checkSigninResponseState(url: string = window.location.href, removeState: boolean = true) {
     const oid_response = await this._client.readSigninResponseState(url, removeState);
     if (oid_response) {
-      // await this._processSigninResponse(oid_response);
       const loginCfg = {
-        // headers: { Authorization: `Bearer ${oidcUser?.access_token}` },
       };
       const response: any = await axios.post(
-        // API_PATH.OIDC_INNKEEPER_LOGIN,
         API_PATH.OIDC_OIDC_LOGIN,
         oid_response,
         loginCfg,
@@ -70,29 +67,12 @@ export const useOidcStore = defineStore('oidcStore', () => {
   .catch((err:any) => {
     console.error(err);
   });
-  // userManager
-  //   .signinRedirectCallback()
-  //   .then(() => {
-  //     loading.value = true;
-  //   })
-  //   .catch((err) => {
-  //     console.error(err);
-  //   });
 
   userManager.onSuccessfulSignin(async (token_response: any) => {
     try {
       // Get the logged in user from the OIDC library
       const oidcUser = await userManager.getUser();
       user.value = oidcUser;
-
-      // const loginCfg = {
-      //   headers: { Authorization: `Bearer ${oidcUser?.access_token}` },
-      // };
-      // const response: any = await axios.get(
-      //   // API_PATH.OIDC_INNKEEPER_LOGIN,
-      //   API_PATH.OIDC_OIDC_LOGIN,
-      //   loginCfg
-      // );
       token.value = token_response.token;
       if (token.value) localStorage.setItem('token', token.value);
 
