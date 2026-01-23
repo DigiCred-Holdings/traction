@@ -22,17 +22,22 @@ class UserManager_TactionOverride extends UserManager {
   public onSuccessfulSignin(cb: (token: any) => void) {
     this._signinCb = cb;
   }
-  public async checkSigninResponseState(url: string = window.location.href, removeState: boolean = true) {
-    const oid_response = await this._client.readSigninResponseState(url, removeState);
+  public async checkSigninResponseState(
+    url: string = window.location.href,
+    removeState: boolean = true
+  ) {
+    const oid_response = await this._client.readSigninResponseState(
+      url,
+      removeState
+    );
     if (oid_response) {
-      const loginCfg = {
-      };
+      const loginCfg = {};
       const response: any = await axios.post(
         API_PATH.OIDC_OIDC_LOGIN,
         oid_response,
-        loginCfg,
+        loginCfg
       );
-      console.log("OIDC Login Response:", response.data);
+      console.log(`OIDC Login Response:`, response.data);
       this._signinCb(response.data);
     }
   }
@@ -58,15 +63,19 @@ export const useOidcStore = defineStore('oidcStore', () => {
     ),
   };
 
-  const userManager: UserManager_TactionOverride = new UserManager_TactionOverride(settings);
-  userManager.checkSigninResponseState()
-  .then(async (val: any) => {
-    console.log('signed in', val);
-    loading.value = true;
-  })
-  .catch((err:any) => {
-    console.error(err);
-  });
+  const userManager: UserManager_TactionOverride =
+    new UserManager_TactionOverride(settings);
+
+  userManager
+    .checkSigninResponseState()
+
+    .then(async (val: any) => {
+      console.log('signed in', val);
+      loading.value = true;
+    })
+    .catch((err: any) => {
+      console.error(err);
+    });
 
   userManager.onSuccessfulSignin(async (token_response: any) => {
     try {
@@ -100,7 +109,6 @@ export const useOidcStore = defineStore('oidcStore', () => {
           toast.error(`Failure getting tenant info: ${err}`);
         }
       }
-
     } catch (err: any) {
       error.value = err;
     } finally {
@@ -118,7 +126,10 @@ export const useOidcStore = defineStore('oidcStore', () => {
   // Ations
   async function login() {
     loading.value = true;
-    return userManager.signinRedirect({prompt: 'select_account', scope: 'openid profile email'});
+    return userManager.signinRedirect({
+      prompt: 'select_account',
+      scope: 'openid profile email',
+    });
   }
 
   return {
