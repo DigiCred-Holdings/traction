@@ -6,7 +6,6 @@ import { UserManager } from 'oidc-client-ts';
 import { OidcClient } from 'oidc-client-ts';
 import { configStringToObject } from '@/helpers';
 import { API_PATH } from '@/helpers/constants';
-// import { useTokenStore } from '../tokenStore';
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
 import { useTenantStore, useTokenStore } from '../../store';

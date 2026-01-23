@@ -10,7 +10,6 @@ import acaPyService from "../services/acapy-service";
 import messageService from "../services/message-service";
 import redisService from "../services/redis-service";
 import tiffService from "../services/tiff-service";
-import { all } from "axios";
 
 export const router = express.Router();
 
