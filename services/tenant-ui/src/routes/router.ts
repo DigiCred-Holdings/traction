@@ -5,10 +5,12 @@ import * as innkeeperComponent from "../components/innkeeper";
 import { body, validationResult } from "express-validator";
 import { NextFunction } from "express";
 import oidcMiddleware from "../middleware/oidcMiddleware";
+import {oidcGoogleMiddleware} from "../middleware/oidcMiddleware";
 import acaPyService from "../services/acapy-service";
 import messageService from "../services/message-service";
 import redisService from "../services/redis-service";
 import tiffService from "../services/tiff-service";
+import { all } from "axios";
 
 export const router = express.Router();
 
@@ -84,27 +86,46 @@ router.get(
   }
 );
 
-router.get(
+console.log("Router loaded");
+router.post(
   "/oidcLogin",
-  oidcMiddleware,
+  oidcGoogleMiddleware,
   async (req: any, res: Response, next: NextFunction) => {
     try {
-      console.log(req.claims);
+      // console.log("OIDC Login endpoint invoked");
+      // await oidcGoogleMiddleware(req, res, async () => {
+      //   console.log("Inside OIDC Google Middleware callback");
+      // });
+      const allowedUsers = config.get<string>("server.oidc.allowedUsers").split(',').map(u => u.trim());
+      const allowedUsersPopulated = allowedUsers.length !== 0 && allowedUsers.every(u => u.length !== 0);
+      const tenantId: string = config.get("server.innkeeper.user");
       if (
-        req.claims.realm_access &&
-        req.claims.realm_access.roles &&
-        req.claims.realm_access.roles.includes(
-          config.get("server.oidc.roleName")
+        req.claims.email_verified &&
+        req.claims.email &&
+        req.claims.email.length > 0 &&
+        req.claims.sub &&
+        req.claims.sub.length > 0 &&
+        allowedUsersPopulated &&
+        (
+          allowedUsers.includes(req.claims.email) ||
+          allowedUsers.includes(req.claims.sub)
         )
       ) {
+        console.log(`Whitelisted User "${req.claims.name} <${req.claims.email}> ($${req.claims.sub})" logged in via OpenID Connect as Tenant ${tenantId}`);
+        const result = await innkeeperComponent.oidcLogin();
+        res.status(200).send(result);
+      } else if (allowedUsersPopulated === false && req.claims.email_verified) {
+        console.log(`User "${req.claims.name} <${req.claims.email}> ($${req.claims.sub})" logged in via OpenID Connect as Tenant ${tenantId}`);
         const result = await innkeeperComponent.oidcLogin();
         res.status(200).send(result);
       } else {
-        res.status(403).send({ error: "User does not have required role", claims: req.claims });
+        console.log(`User "${req.claims.name} <${req.claims.email}> ($${req.claims.sub})" attempted to log in but is not an authorized user.`);
+        res.status(403).send({ error: "User does not have required role" });
       }
     } catch (error) {
       console.error(`Error logging in: ${error}`);
-      next(error);
+      res.status(200).send({"result": "testing"});
+      // next(error);
     }
   }
 );
