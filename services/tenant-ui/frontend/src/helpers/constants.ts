@@ -16,6 +16,7 @@ export const API_PATH = {
 
   // TODO: Align these urls
   OIDC_INNKEEPER_LOGIN: '/api/innkeeperLogin',
+  OIDC_OIDC_LOGIN: '/api/oidcLogin',
   OIDC_INNKEEPER_RESERVATION: '/innkeeperReservation',
 
   // Acapy and Plugins
