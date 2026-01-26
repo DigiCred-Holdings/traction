@@ -37,13 +37,11 @@ const oidcGoogleMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
     const { state, response } = req.body;
     
     // Fetch .well-known/openid-configuration to get token_endpoint
     const authority: string = config.get("server.oidc.authority");
     const configId: string = config.get("server.oidc.clientId");
-    const tenantId: string = config.get("server.innkeeper.user");
     const configSecret: string = config.get("server.oidc.clientSecret");
     const oid_config = await axios.get(`${authority}/.well-known/openid-configuration`);
     const tokenEndpoint = oid_config.data.token_endpoint;
