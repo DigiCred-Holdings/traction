@@ -506,8 +506,7 @@ async function previewAndPreparePdf() {
     const contentElement = vm.$refs.printableView;
     if (contentElement) {
       // Calculate how many pages we need based on content height
-      const computedStyle = getComputedStyle(contentElement);
-      const pageHeight = parseFloat(computedStyle.height) * (window.devicePixelRatio || 1);
+      const pageHeight = 1123; // Approximate A4 height in pixels at 96 DPI
       const contentHeight = contentElement.scrollHeight;
       const numberOfPages = Math.ceil(contentHeight / pageHeight);
 
