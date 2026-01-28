@@ -30,7 +30,8 @@ export const useIssuerStore = defineStore('issuer', () => {
       `${API_PATH.ISSUE_CREDENTIAL_20_RECORDS}?role=issuer`,
       credentials,
       error,
-      loading
+      loading,
+      { limit: 10000 }
     );
   }
 
