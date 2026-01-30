@@ -578,8 +578,8 @@ async function confirmPdfDownload() {
   }
 
   try {
-    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-    const margin = 10;
+    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'letter' });
+    const margin = 0;
 
     // Add all content pages
     for (let i = 0; i < pdfPreviewImageSrc.value.pages.length; i++) {
