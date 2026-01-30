@@ -35,7 +35,7 @@ export const useMessageStore = defineStore('messages', () => {
      * is passed in, add it to the params.
      */
     let params = {};
-    if (connId) params = { connection_id: connId };
+    if (connId) params = { connection_id: connId, limit: 10000 };
 
     return fetchListFromAPI(
       acapyApi,

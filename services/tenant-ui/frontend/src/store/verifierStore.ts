@@ -27,7 +27,8 @@ export const useVerifierStore = defineStore('verifier', () => {
       API_PATH.PRESENT_PROOF_20_RECORDS,
       presentations,
       error,
-      loading
+      loading,
+      { limit: 10000 }
     );
   }
 
