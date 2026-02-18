@@ -9,7 +9,7 @@
         <div class="info-left">
           <b>District Name: {{ enrollment.student_info.schoolDistrict }}</b>
           <br />
-          <b>{{ enrollment.school_name }} Official Transcript</b>
+          <b>{{ enrollment.school_name }} Transcript</b>
           <p>Accreditation: {{ enrollment.student_info.schoolAccreditation }}</p>
           <p>
             School CEEB Code: {{ enrollment.student_info.schoolCeebCode }} School Code:
