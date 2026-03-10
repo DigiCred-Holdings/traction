@@ -207,7 +207,7 @@
       </div>
     </div>
     <div class="signature-section">
-      <img src="./verified-stamp.jpg" />
+      <img src="./verified-stamp.png" />
     </div>
   </div>
 </template>
